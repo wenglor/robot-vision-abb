@@ -44,14 +44,14 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
    | robot files from [sources folder](sources)     | `/HOME` or `/HOME/<project_folder>`              |
 
 3. Follow the [configuration](#configuration-wengloruserconfigmodx) steps.
-4. Load the program [Generic wenglor vision interface.modx](sources/Generic%20wenglor%20vision%20interface.pgf) on your robot.
 
 ---
 
 ## Running the Sample Program
 
-1. Select the TCP you used for the calibration.
-2. Start the previously loaded program and follow the messages on the FlexPendant.
+1. Load the program [Generic wenglor vision interface.modx](sources/Generic%20wenglor%20vision%20interface.pgf) on your robot.
+2. Select the TCP used for calibration in the FlexPendant.
+3. Execute the program and monitor the messages on the FlexPendant display.
 
 ---
 
