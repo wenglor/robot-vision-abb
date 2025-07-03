@@ -17,7 +17,7 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
    3. [Teaching Poses](#teaching-poses-and-defining-movements)
 5. [Troubleshooting](#troubleshooting)
    1. [Communication errors](#communication-errors)
-   2. [Calibration failed](#calibration-failed)
+   2. [Insufficient Calibration Accuracy](#insufficient-calibration-accuracy)
 6. [Support & Feedback](#support--feedback)
 
 ---
@@ -56,6 +56,7 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
 ---
 
 ## Configuration (`wenglorUserConfig.modx`)
+
 There are two options to set the variables:
 
 1. You can either update those values by navigating to the [wenglorUserConfig.modx file](sources/wenglorUserConfig.modx)
