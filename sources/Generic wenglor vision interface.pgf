@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<Program>
+	<Module>wenglorUserConfig.modx</Module>
+	<Module>wenglorGlobal.modx</Module>
+	<Module>wenglorDetect.modx</Module>
+	<Module>wenglorCalibration.modx</Module>
+</Program>

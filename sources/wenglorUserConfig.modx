@@ -1,0 +1,75 @@
+MODULE wenglorUserConfig
+    !***********************************************************
+    !
+    ! Module:  wenglorUserConfig
+    !
+    ! Author: wenglor sensoric GmbH
+    !
+    ! Version: 1.1.0
+    !
+    ! Description:
+    !   This module holds some global variables and helper functions.
+    !
+    ! How to start:
+    ! * Set port and IP address in the section below, as well as the use case "camera_on_robot" or "camera_not_on_robot".
+    ! * Check if ABB is selected in the robot manufacturer drop down of the robot server on the device website of the machine vision device (e.g. B60, MVC).
+    ! * Do the calibration, if not done so far
+    !
+    ! How to do the calibration:
+    ! * Rename the uniVision calibration job in the section below so it fits to your selected name.
+    ! * Set at least five calibration poses, its the variance of the calibration movements that matters, not the variance of the calibration poses.
+    ! * Please use the calibration pose variables from the section below wenglorCalib1, wenglorCalib2, ...
+    ! * If you want to use more than 5 calibration poses, follow the naming schema and extend the calibration pose schema from wenglorCalibration - runCalibration() 
+    ! * Check if the movements are safe by moving manually from pose to pose in debug mode.
+    ! * Name the calibration target you are using in the constant WENGLOR_CALIBRATION_PLATE in the section below.
+    ! * If your camera is not mounted on the robot, please also set a wenglorDetection pose, as the calibration plate will be placed
+    !   on the object ground in the second step of the calibration in this case. 
+    !   The robot will move to the detection pose to detection the calibration target placed on the object ground
+    !
+    ! After the calibration:
+    ! * Take a look at the main procedure of wenglorDetect.
+    ! * Replace the wenglorDetection job name with the one you are using.
+    ! * Ensure your tool is properly set.
+    ! * If you notice some height offset check if the uniVision job is properly set, especially the height offset from the calibration target to
+    !   the object in the "Device Robot Vision".
+    ! * This is just a very basic example, if you want to know how to handle multiple objects with just one wenglorDetection, 
+    !   use different shape models, the additional values you linked in uniVision or access an object pose via an index, 
+    !   check the uniVision operating instructions DNNF023.
+    !
+    !***********************************************************
+
+    !*********************************************************** USER CONFIG ********************************************************!
+    ! Replace ip address and port with your setup
+    CONST string WENGLOR_IP_ADDRESS:="192.168.100.1";
+    CONST num WENGLOR_CAM_PORT:=32006;
+
+    ! Comment out the correct line depending on the selected camera/robot setup
+    CONST string WENGLOR_USE_CASE:="camera_on_robot";
+    !CONST string WENGLOR_USE_CASE := "camera_not_on_robot";
+
+    ! Replace with the calibration plate you are using
+    ! if you are using zvzj005, replace with zvzj001 and
+    ! if you are using zvzj006, replace with zvzj002
+    CONST string WENGLOR_CALIBRATION_PLATE:="zvzj001";
+    ! Replace the calibration job with the one you created in uniVision
+    CONST string WENGLOR_CALIBRATION_JOB:="calibration.u3p";
+    CONST string WENGLOR_DETECTION_JOB:="find_objects.u3p";
+
+    ! Adjust validation z safety offset [mm]
+    CONST num WENGLOR_Z_SAFETY_OFFSET_MM:=10;
+    
+    ! Set speed for calibration movements here
+    CONST speeddata WENGLOR_CALIB_SPEED:=v100;
+    ! Set calibration poses here
+    VAR robtarget wenglorCalib1:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    VAR robtarget wenglorCalib2:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    VAR robtarget wenglorCalib3:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    VAR robtarget wenglorCalib4:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    VAR robtarget wenglorCalib5:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+
+    ! Set wenglorDetection pose here for camera_not_on_robot case, otherwise don't change as will be changed in runCalibration()
+    PERS robtarget wenglorDetection:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    
+    !******************************************************* END USER CONFIG ********************************************************!
+
+ENDMODULE
