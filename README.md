@@ -36,7 +36,7 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
 
 ## Installation
 
-1. Download the files from the [sources](sources) directory.
+1. Get the files from the [sources](sources) directory.
 2. Copy them to the robot controller.
 
    | Sources                                        | Destination                                      |
