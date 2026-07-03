@@ -1,24 +1,32 @@
 # Example ABB RAPID program files for the generic vision interface
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 
 This repository demonstrates how to use the Generic Vision Interface with wenglor vision devices on a ABB controller. The included `.modx` and `.pgf` files form a working sample program [Generic wenglor vision interface.modx](sources/Generic%20wenglor%20vision%20interface.pgf) that you can adopt and customize for your application.
+
+> NOTE
+>
+> This repository focuses exclusively on ABB Robots-specific topics. For general robot vision information, please refer to the [wenglor robot vision manual](https://wenglor.github.io/wenglor-robot-vision/).
+
+📖 **Full documentation** is available in the [online manual](https://wenglor.github.io/wenglor-abb-robots-vision/)
 
 ---
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Installation](#installation)
-3. [Running the Sample Program](#running-the-sample-program)
-4. [Configuration (`wenglorUserConfig.modx`)](#configuration-wengloruserconfigmodx)
-   1. [Network Setup](#network-setup)
-   2. [Adjusting Parameter](#adjusting-parameter)
-   3. [Teaching Poses](#teaching-poses-and-defining-movements)
-5. [Troubleshooting](#troubleshooting)
-   1. [Communication errors](#communication-errors)
-   2. [Insufficient Calibration Accuracy](#insufficient-calibration-accuracy)
-6. [Support & Feedback](#support--feedback)
+- [Example ABB RAPID program files for the generic vision interface](#example-abb-rapid-program-files-for-the-generic-vision-interface)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the Sample Program](#running-the-sample-program)
+  - [Configuration (`wenglorUserConfig.modx`)](#configuration-wengloruserconfigmodx)
+    - [Network Setup](#network-setup)
+    - [Adjusting Parameter](#adjusting-parameter)
+    - [Teaching Poses and Defining Movements](#teaching-poses-and-defining-movements)
+  - [Troubleshooting](#troubleshooting)
+    - [Communication Errors](#communication-errors)
+    - [Insufficient Calibration Accuracy](#insufficient-calibration-accuracy)
+  - [Support \& Feedback](#support--feedback)
 
 ---
 

@@ -6,11 +6,11 @@ MODULE wenglorCalibration
     !
     ! Author: wenglor sensoric GmbH
     !
-    ! Version: 1.1.0
+    ! Version: 1.2.0
     !
     ! Description:
-    !   This is the module that handles the calibration from the camera to the robot and if required the calibration
-    !   from the camera to the object ground in the case if the camera is not mounted on the robot.
+    !   This module handles calibration from the camera to the robot and, if required, calibration
+    !   from the camera to the object ground when the camera is not mounted on the robot.
     !
     !***********************************************************
 
@@ -18,24 +18,58 @@ MODULE wenglorCalibration
     PERS tooldata currentToolValue:=[TRUE,[[0,0,0],[1,0,0,0]],[0.5,[0,0,0],[1,0,0,0],0,0,0]];
     CONST robtarget emptyPose:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 
+    PROC clearCalibrationBuffer()
+    ! Clears the calibration buffer in the vision system.
+        sendSimpleCommand("calibration:clear;");
+    ENDPROC
 
-    FUNC num sendCalculateCalibration(string command)
+    PROC addCalibrationPose()
+    ! Triggers the vision system and adds the provided pose for calibration.
+        sendSimpleCommand("calibration:add["+getRobPos()+"];");
+    ENDPROC
+
+    FUNC num calculateCalibration()
+    ! Triggers the vision system to calculate calibration based on the added poses and captured images.
         VAR string camResponse;
         VAR bool parsingOk;
         VAR num reprojectionError;
-        camResponse:=sendAndReadString(command);
-        checkCameraReply(camResponse);
+
+        camResponse:=sendAndReadString("calibration:calculate["+W_USE_CASE+","+W_CALIBRATION_TARGET+"];");
         parsingOk:=StrToVal(camResponse,reprojectionError);
+        IF (parsingOk = FALSE) THEN
+            warningMessage("Failed to parse calibration result. Exiting program.");
+            EXIT;
+        ENDIF
         RETURN reprojectionError;
     ENDFUNC
 
+    PROC calibrateToGround()
+    ! Calibrates the camera-to-ground relation for the "camera_not_on_robot" use case only.
+    ! Also creates a new calibration file if the robot-to-camera relation was calibrated before with the "calibration:calculate" command.
+
+        IF (W_USE_CASE<>"camera_not_on_robot") THEN
+            warningMessage("Camera-to-ground calibration is not required here.");
+            RETURN;
+        ENDIF
+        sendSimpleCommand("calibration:ground["+W_CALIBRATION_TARGET+"];");
+    ENDPROC
+
+    PROC calibrateToTarget()
+    ! Calibrates the camera-to-calibration-target relation for the given use case.
+    ! Does not create a new calibration file; calibration is only saved temporarily in the vision device buffer.
+
+        sendSimpleCommand("calibration:target[" + W_USE_CASE + "," + W_CALIBRATION_TARGET +"];");
+    ENDPROC
+
     PROC runCalibration()
+    ! Executes the calibration procedure.
+
         VAR btnres answer;
         VAR num calibAccuracy;
         VAR string calibPrepareMsg;
 
-        IF (wenglorCalib1=emptyPose OR wenglorCalib2=emptyPose OR wenglorCalib3=emptyPose OR wenglorCalib4=emptyPose OR wenglorCalib5=emptyPose) THEN
-            UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Exit program as calibration poses are not set."\Buttons:=btnOK,\Icon:=iconWarning;
+        IF (wCalibPose1=emptyPose OR wCalibPose2=emptyPose OR wCalibPose3=emptyPose OR wCalibPose4=emptyPose OR wCalibPose5=emptyPose) THEN
+            warningMessage("Exit program as calibration poses are not set.");
             EXIT;
         ENDIF
 
@@ -45,75 +79,71 @@ MODULE wenglorCalibration
         ! Check the camera state and if a calibration is already available
         updateCameraState;
 
-        ! To prevent old calibratio data are used, we clear the buffer
-        sendSimpleCommand("calibration:clear;");
-        sendSimpleCommand("job:change["+WENGLOR_CALIBRATION_JOB+"];");
-
-        IF (WENGLOR_USE_CASE="camera_not_on_robot") THEN
-            calibPrepareMsg:="Confirm when calibration board was mounted and correct tool is selected.";
-        ELSEIF (WENGLOR_USE_CASE="camera_on_robot") THEN
-            calibPrepareMsg:="Confirm when calibration board was placed and correct tool is selected.";
+        IF wenglorCalibDone=TRUE THEN
+            answer:= userDialog("Calibration already done. Redo?");
+            IF (answer=resCancel) THEN
+                infoMessage("Calibration skipped.");
+                RETURN;
+            ENDIF
         ENDIF
-        UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,calibPrepareMsg,
-            \Buttons:=btnOKCancel,\Icon:=iconInfo,\Result:=answer;
+
+        ! Clear the camera-side buffer to prevent old calibration data from being used.
+        clearCalibrationBuffer;
+        loadJob(W_CALIBRATION_JOB);
+
+        IF (W_USE_CASE="camera_not_on_robot") THEN
+            calibPrepareMsg:="Confirm when the calibration target is mounted and the correct tool is selected.";
+        ELSEIF (W_USE_CASE="camera_on_robot") THEN
+            calibPrepareMsg:="Confirm when the calibration target is placed and the correct tool is selected.";
+        ELSE
+            warningMessage("Unknown use case. Exiting program.");
+            EXIT;
+        ENDIF
+        answer:= userDialog(calibPrepareMsg);
         IF (answer=resCancel) THEN
-            UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Exit program as calibration was aborted."\Buttons:=btnOK,\Icon:=iconWarning;
+            warningMessage("Calibration aborted");
             EXIT;
         ENDIF
 
-        MoveL wenglorCalib1,WENGLOR_CALIB_SPEED,fine,currentToolValue;
+        MoveL wCalibPose1,W_CALIB_SPEED,fine,currentToolValue;
         WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
+        addCalibrationPose;
+        MoveL wCalibPose2,W_CALIB_SPEED,fine,currentToolValue;
+        WaitTime 1;
+        addCalibrationPose;
+        MoveL wCalibPose3,W_CALIB_SPEED,fine,currentToolValue;
+        WaitTime 1;
+        addCalibrationPose;
+        MoveL wCalibPose4,W_CALIB_SPEED,fine,currentToolValue;
+        WaitTime 1;
+        addCalibrationPose;
 
-        MoveL wenglorCalib2,WENGLOR_CALIB_SPEED,fine,currentToolValue;
+        MoveL wCalibPose5,W_CALIB_SPEED,fine,currentToolValue;
         WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
-
-        MoveL wenglorCalib3,WENGLOR_CALIB_SPEED,fine,currentToolValue;
-        WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
-
-        MoveL wenglorCalib4,WENGLOR_CALIB_SPEED,fine,currentToolValue;
-        WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
-
-        MoveL wenglorCalib5,WENGLOR_CALIB_SPEED,fine,currentToolValue;
-        WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
+        addCalibrationPose;
 
         ! Add more calibration poses if wanted
 
-        calibAccuracy:=sendCalculateCalibration("calibration:calculate["+WENGLOR_USE_CASE+","+WENGLOR_CALIBRATION_PLATE+"];");
+        calibAccuracy:=calculateCalibration();
 
-        IF (WENGLOR_USE_CASE="camera_on_robot") THEN
-            ! For the camera on robot case, the first calibration pose is also the wenglorDetection pose
-            wenglorDetection:=wenglorCalib1;
-        ELSEIF (WENGLOR_USE_CASE="camera_not_on_robot") THEN
-            IF (wenglorDetection=emptyPose) THEN
-                UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Exit program as wenglorDetection pose is not set."\Buttons:=btnOK,\Icon:=iconWarning;
+        IF (W_USE_CASE="camera_on_robot") THEN
+            ! For the camera on robot case, the first calibration pose is also the wDetectionPose pose
+            wDetectionPose:=wCalibPose1;
+        ELSEIF (W_USE_CASE="camera_not_on_robot") THEN
+            IF (wDetectionPose=emptyPose) THEN
+                warningMessage("Exit program as wDetectionPose pose is not set.");
                 EXIT;
             ENDIF
-            MoveL wenglorDetection,v200,fine,currentToolValue;
-            UIMsgBox
-                \Header:=WENGLOR_MESSAGE_HEADER,"Confirm when calibration board was placed on object ground.",
-                \Buttons:=btnOKCancel,\Icon:=iconInfo,\Result:=answer;
+            ! Move to the detection pose so the user can place the calibration target on the ground and the robot does not block it.
+            MoveL wDetectionPose,v200,fine,currentToolValue;
+            answer:= userDialog("Confirm when calibration target was placed on object ground.");
             IF (answer=resOK) THEN
-                sendSimpleCommand("calibration:ground["+WENGLOR_CALIBRATION_PLATE+"];");
-                UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Calibration step 2 done."\Buttons:=btnOK,\Icon:=iconInfo;
+                calibrateToGround;
+                infoMessage("Calibration to ground done.");
             ELSE
-                UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Calibration step 2 canceled."\Buttons:=btnOK,\Icon:=iconInfo;
+                infoMessage("Calibration to ground aborted.");
                 EXIT;
             ENDIF
-        ENDIF
-
-        UIMsgBox
-            \Header:=WENGLOR_MESSAGE_HEADER,"Do you want to validate the calibration?",
-            \Buttons:=btnYesNo,\Icon:=iconQuestion,\Result:=answer;
-        IF (answer=resNo) THEN
-            UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Validation skipped."\Buttons:=btnOK,\Icon:=iconInfo;
-            RETURN;
-        ELSEIF (answer=resYes) THEN
-            validateCalibration(WENGLOR_Z_SAFETY_OFFSET_MM);
         ENDIF
     ENDPROC
 
@@ -122,31 +152,60 @@ MODULE wenglorCalibration
         VAR robtarget targetPose;
         VAR btnres answer:=0;
         VAR string cameraReply;
-        VAR string formattedMessage;
         VAR bool errorCodeInside;
         VAR num errorCode;
         VAR robtarget errorPose;
 
-        ! get current tool
-        GetSysData currentToolValue;
-        MoveL wenglorDetection,v200,fine,currentToolValue;
+        updateCameraState;
 
-        cameraReply:=sendAndReadString("validate["+WENGLOR_USE_CASE+","+getRobPos()+"];");
-
-        errorCodeInside:=StrToVal(cameraReply,errorCode);
-        IF (errorCodeInside) THEN
-            ! return current pose in case of error, as no other pose can be considered safe
-            setReturnError errorCode;
-            errorPose:=CRobT();
-            targetPose:=errorPose;
+        IF wenglorCalibDone=FALSE THEN
+            warningMessage("Calibration not done, cannot validate. Exiting procedure.");
+            EXIT;
         ENDIF
 
-        formattedMessage:=replaceParantheses(cameraReply);
-        targetPose:=stringToPose(formattedMessage);
+        answer:= userDialog("Move to detection pose and confirm to validate calibration?");
+        IF (answer=resCancel) THEN
+            infoMessage("Calibration validation aborted.");
+            RETURN;
+        ENDIF
+
+        ! get current tool
+        GetSysData currentToolValue;
+        MoveL wDetectionPose,v200,fine,currentToolValue;
+
+        cameraReply:=sendAndReadString("validate["+W_USE_CASE+","+getRobPos()+"];");
+
+        targetPose:=stringToPose(cameraReply);
         targetPose.trans.z:=targetPose.trans.z+safetyOffsetMm;
 
         MoveL targetPose,v50,fine,currentToolValue;
 
-        UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Confirm if calibration result was checked."\Buttons:=btnOK,\Icon:=iconInfo;
+        infoMessage("Confirm when calibration result was checked.");
     ENDPROC
+
+    PROC calibrateIfNeeded()
+        VAR btnres answer;
+        ! Run calibration if no calibration data is available.
+        updateCameraState;
+
+        IF wenglorCalibDone=FALSE THEN
+            infoMessage("No calibration found, starting calibration procedure.");
+            runCalibration;
+
+            updateCameraState;
+
+            IF wenglorCalibDone=FALSE THEN
+                warningMessage("Calibration failed. Aborting program.");
+                EXIT;
+            ELSE
+                validateCalibration(W_SAFETY_OFFSET_MM);
+                answer:= userDialog("Calibration successful. Proceed with detection?");
+                IF (answer=resCancel) THEN
+                    infoMessage("Aborting program.");
+                    EXIT;
+                ENDIF
+            ENDIF
+        ENDIF
+    ENDPROC
+
 ENDMODULE
