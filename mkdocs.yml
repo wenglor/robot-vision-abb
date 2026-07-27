@@ -1,8 +1,8 @@
 site_name: ABB Robots Vision Manual
 site_description: Example ABB (OmniCore / IRC5) integration for the wenglor robot vision API.
-site_url: https://wenglor.github.io/wenglor-abb-robots-vision/
-repo_url: https://github.com/wenglor/wenglor-abb-robots-vision
-repo_name: wenglor-abb-robots-vision
+site_url: https://wenglor.github.io/robot-vision-abb/
+repo_url: https://github.com/wenglor/robot-vision-abb
+repo_name: robot-vision-abb
 use_directory_urls: true
 
 theme:
@@ -10,9 +10,13 @@ theme:
   logo: images/wenglor_logo.svg
   features:
     - navigation.indexes
+    - navigation.top
+    - navigation.sections
     - content.code.copy
+    - content.tabs.link
     - toc.integrate
     - search.highlight
+    - search.suggest
 
 nav:
   - index.md
@@ -29,14 +33,21 @@ nav:
 
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
   - codehilite
   - toc:
       permalink: true
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.tabbed
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.highlight
   - pymdownx.snippets
 
@@ -49,6 +60,8 @@ copyright: "© 2026 wenglor sensoric group"
 
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - path: javascripts/mermaid.mjs
+    type: module
 
 extra_css:
   - css/image_format.css

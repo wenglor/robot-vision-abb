@@ -31,13 +31,25 @@ ENDPROC
 
 Each routine first calls `calibrateIfNeeded`, which runs a calibration if no calibration data is available on the device yet.
 
+```mermaid
+graph TD
+    Start(["main()"]) --> Command{"W_USER_COMMAND"}
+    Command -- singleDetection --> Single["singleDetection"]
+    Command -- multiDetection --> Multi["multiDetection"]
+    Command -- updateReferenceFrame --> Update["updateReferenceFrame"]
+    Single --> Calib["calibrateIfNeeded"]
+    Multi --> Calib
+    Update --> Calib
+    Calib --> Detect["Detection"]
+```
+
 ## Calibration
 
 The calibration process differs depending on whether the camera is mounted on the robot or not. The sections below describe only how the **ABB example** performs each case.
 
 > NOTE
 >
-> For the general calibration concepts — which calibration plate to use, how to choose and vary the poses, and how to read the reprojection error — see the [Calibration Guidelines](https://wenglor.github.io/wenglor-robot-vision/4_0_robot_vision_server/4_1_calibration_guidelines/) in the wenglor robot vision manual. The description here does not repeat them.
+> For the general calibration concepts — which calibration plate to use, how to choose and vary the poses, and how to read the reprojection error — see the [Calibration Guidelines](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_calibration_guidelines/) in the wenglor robot vision manual. The description here does not repeat them.
 
 The poses are taught in `wenglorUserConfig.modx` (`wCalibPose1` … `wCalibPose5`); the example moves through them in `wenglorCalibration.runCalibration()`, calling `calibration:add` at each pose.
 
@@ -85,7 +97,7 @@ After calibration, `wenglorCalibration.validateCalibration()` performs an option
 
 > NOTE
 >
-> For what a good calibration looks like (Z-axis orientation, expected reprojection error values), see the [Calibration Guidelines](https://wenglor.github.io/wenglor-robot-vision/4_0_robot_vision_server/4_1_calibration_guidelines/) in the wenglor robot vision manual.
+> For what a good calibration looks like (Z-axis orientation, expected reprojection error values), see the [Calibration Guidelines](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_calibration_guidelines/) in the wenglor robot vision manual.
 
 ## Detection
 
@@ -128,6 +140,10 @@ You can extend this with conditional checks on the shape model or additional val
 ### `updateReferenceFrame`
 
 Used for mobile platforms and similar use cases (e.g. correcting positional deviations of a mobile platform in front of a machine or shelf). It detects the calibration target, updates `wReferenceFrame`, and — once the machine poses have been taught relative to that frame — moves to them:
+
+> NOTE
+>
+> `detectTarget()` in `wenglorDetect` wraps the `target:pose` command. `wenglorCalibration` also provides `calibrateToTarget()`, wrapping `calibration:target`, to recalibrate the camera-to-target relation without writing a new calibration file — it is not called by any routine in this example, but is available for custom use cases. See [Target Pose and Camera-to-Target Calibration](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_6_0_target_pose_and_camera_to_target/) in the wenglor robot vision manual.
 
 ```rapid
 targetPose:=detectTarget();

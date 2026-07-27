@@ -22,7 +22,7 @@
 
 ## Error codes returned by the device
 
-If the robot server returns a negative error code (`-5001` … `-5010`), the example maps it to a readable message in `wenglorGlobal.setReturnError` and shows it on the FlexPendant before exiting. For the meaning of each code, see the [Generic Robot Vision Interface → Error codes](https://wenglor.github.io/wenglor-robot-vision/4_0_robot_vision_server/4_5_0_generic_robot_vision_interface/#error-codes) in the wenglor robot vision manual.
+If the robot server returns a negative error code (`-5001` … `-5010`), the example maps it to a readable message in `wenglorGlobal.setReturnError` and shows it on the FlexPendant before exiting. For the meaning of each code, see the [Generic Robot Vision Interface → Error codes](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_5_0_generic_robot_vision_interface/#error-codes) in the wenglor robot vision manual.
 
 ## Program exits unexpectedly
 

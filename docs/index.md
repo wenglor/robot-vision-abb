@@ -2,7 +2,7 @@
 
 > NOTE
 >
-> This manual focuses exclusively on ABB Robots-specific topics. For general robot vision information, please refer to the [wenglor robot vision manual](https://wenglor.github.io/wenglor-robot-vision/).
+> This manual focuses exclusively on ABB Robots-specific topics. For general robot vision information, please refer to the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/).
 
 This repository contains an example RAPID program to set up and start the generic vision interface to wenglor Machine Vision Devices on your ABB robot.
 
@@ -33,4 +33,4 @@ The robot vision example for ABB consists of the following files:
 
 > NOTE
 >
-> The generic robot vision API (commands, return values, error codes), the calibration guidelines, and the uniVision job setup are documented once in the [wenglor robot vision manual](https://wenglor.github.io/wenglor-robot-vision/4_0_robot_vision_server/) and are **not** repeated here. This manual only describes how the ABB example uses them.
+> The generic robot vision API (commands, return values, error codes), the calibration guidelines, and the uniVision job setup are documented once in the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) and are **not** repeated here. This manual only describes how the ABB example uses them.

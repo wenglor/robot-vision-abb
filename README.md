@@ -6,9 +6,9 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
 
 > NOTE
 >
-> This repository focuses exclusively on ABB Robots-specific topics. For general robot vision information, please refer to the [wenglor robot vision manual](https://wenglor.github.io/wenglor-robot-vision/).
+> This repository focuses exclusively on ABB Robots-specific topics. For general robot vision information, please refer to the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/).
 
-📖 **Full documentation** is available in the [online manual](https://wenglor.github.io/wenglor-abb-robots-vision/)
+📖 **Full documentation** is available in the [online manual](https://wenglor.github.io/robot-vision-abb/)
 
 ---
 
@@ -32,10 +32,10 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
 
 ## Prerequisites
 
-> Tested with OmniCore controller and Robotware 7.5.13
+> Tested with OmniCore controller and RobotWare 7.5.13 (minimum required: RobotWare 7.3.2)
 
 - Basic knowledge of **RAPID**
-- Omnicore controller, IRC5 is currently not supported
+- OmniCore controller (RobotWare 7.3.2+) or IRC5 controller (RobotWare 5.15+) - for IRC5, rename `.modx` files to `.mod`, update references in the `.pgf` file, and activate the **PC Interface** option
 - RapidSocket are enabled in the controller communication configuration
 - [B60](https://www.wenglor.com/en/Machine-Vision/Smart-Cameras-and-Vision-Sensors/Smart-Camera-B60/c/cxmCID221375) (firmware >= 1.4) or [Machine Vision Controller (MVC)](https://www.wenglor.com/en/Machine-Vision/Machine-Vision-Controllers/c/cxmCID221381) (firmware >= 1.1)
 - A [uniVision](https://www.wenglor.com/en/Machine-Vision/Machine-Vision-Software/Image-Processing-Software-uniVision-3/c/cxmCID222459) job for calibration and object detection
