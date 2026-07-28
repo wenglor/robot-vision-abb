@@ -4,22 +4,7 @@
 >
 > This manual focuses exclusively on ABB Robots-specific topics. For general robot vision information, please refer to the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/).
 
-This repository contains an example RAPID program to set up and start the generic vision interface to wenglor Machine Vision Devices on your ABB robot.
-
-The robot vision example for ABB consists of the following files:
-
-- `Generic wenglor vision interface.pgf`
-- `wenglorUserConfig.modx`
-- `wenglorGlobal.modx`
-- `wenglorCalibration.modx`
-- `wenglorDetect.modx`
-
-> NOTE
->
-> The robot example is available on [www.wenglor.com/product/DNNF023](https://www.wenglor.com/product/DNNF023) → Downloads → Programming examples and configuration files → Examples_Robot_Vision.
->
-> - It works for **OmniCore** robot controllers and requires the minimum software version **RobotWare 7.3.2**.
-> - To run the examples on **IRC5** robot controllers (minimum software version **RobotWare 5.15**): rename the module files from `.modx` to `.mod`, change the `.modx` references to `.mod` within the PGF file, and activate the option **PC Interface**.
+This repository contains an example RAPID program to set up and start the generic vision interface to wenglor Machine Vision Devices on your ABB robot. The program files are available in the [sources](https://github.com/wenglor/robot-vision-abb/tree/main/sources) directory of this repository — see [Installation & Setup](1_0_installation/index.md) for the file list and supported controllers.
 
 ---
 

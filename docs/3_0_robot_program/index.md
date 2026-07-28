@@ -2,8 +2,6 @@
 
 The example program implements a complete robot vision workflow: calibrating the camera to the robot, detecting objects, and moving to them. It is split into several RAPID modules referenced by the `Generic wenglor vision interface.pgf` program file.
 
-<img src="images/01_program_modules_overview.svg" alt="Program modules overview" class="big"/>
-
 ## Modules
 
 | Module | Responsibility |
@@ -43,21 +41,36 @@ graph TD
     Calib --> Detect["Detection"]
 ```
 
+| `W_USER_COMMAND` | Use it when you want to… | Details |
+| --- | --- | --- |
+| `singleDetection` | Pick one object per detection. | [`singleDetection`](#singledetection) |
+| `multiDetection` | Pick all objects found in one image. | [`multiDetection`](#multidetection) |
+| `updateReferenceFrame` | Re-localize a machine, shelf, or mobile platform before picking. | [`updateReferenceFrame`](#updatereferenceframe) |
+
 ## Calibration
 
-The calibration process differs depending on whether the camera is mounted on the robot or not. The sections below describe only how the **ABB example** performs each case.
+Calibrate robot and camera via several calibration poses, where the camera looks from different positions and angles at the calibration plate (hand-eye calibration). Use the recommended calibration plate ZVZJ, or print the corresponding PDF on flat, stiff material. The calibration is done inside the wenglor robot server, including the compensation of the lens distortion and the calculation in mm. The calibration process differs depending on whether the camera is mounted on the robot or not — the sections below describe only how the **ABB example** performs each case.
 
 > NOTE
 >
-> For the general calibration concepts — which calibration plate to use, how to choose and vary the poses, and how to read the reprojection error — see the [Calibration Guidelines](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_calibration_guidelines/) in the wenglor robot vision manual. The description here does not repeat them.
+> For the general calibration concepts — which calibration plate to use, how to choose and vary the poses, and how to read the reprojection error — see [5.1 Basics with Robot Server](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual. The description here does not repeat them.
 
-The poses are taught in `wenglorUserConfig.modx` (`wCalibPose1` … `wCalibPose5`); the example moves through them in `wenglorCalibration.runCalibration()`, calling `calibration:add` at each pose.
+The poses are taught in `wenglorUserConfig.modx` (`wCalibPose1` … `wCalibPose5`); the example moves through them in `wenglorCalibration.runCalibration()`, calling `calibration:add` at each pose. For the most accurate results, make the difference between one pose and the next as large as possible — vary the pose angles as much as you can, since motions with non-parallel rotation axes give the best calibration. See the example calibration poses in [4.1 Camera on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_0_camera_on_robot/#calibration-use-case) and [4.2 Camera not on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_2_0_camera_not_on_robot/#calibration-use-case) in the wenglor robot vision manual.
 
-<img src="images/02_calibration_poses_variation.svg" alt="Calibration poses with large angle variation" class="big"/>
+```mermaid
+graph TD
+    Start(["runCalibration()"]) --> UseCase{"W_USE_CASE"}
+    UseCase -- camera_on_robot --> OnRobotPoses["Move through wCalibPose1…5,\ncalibration:add at each pose"]
+    OnRobotPoses --> OnRobotCalc["calibration:calculate"]
+    OnRobotCalc --> OnRobotDone["wDetectionPose := wCalibPose1"]
+    UseCase -- camera_not_on_robot --> OffRobotPoses["Step 1: mount plate on robot,\nmove through wCalibPose1…5"]
+    OffRobotPoses --> OffRobotCalc["calibration:calculate"]
+    OffRobotCalc --> OffRobotGround["Step 2: place plate on object plane,\nmove to wDetectionPose,\ncalibration:ground"]
+```
 
 ### Camera on robot
 
-Teach a minimum of five calibration poses (seven to eleven for better accuracy). The **first calibration pose is also the detection pose** — choose a pose from which the objects can be reached safely. This is handled automatically by the program:
+If the camera is on the robot, teach a minimum of five calibration poses (e.g. seven to eleven poses for more accurate results). The first calibration pose is also the detection pose — choose one from which the objects can be reached safely. This is handled automatically by the program:
 
 ```rapid
 IF (W_USE_CASE="camera_on_robot") THEN
@@ -65,14 +78,16 @@ IF (W_USE_CASE="camera_on_robot") THEN
     wDetectionPose:=wCalibPose1;
 ```
 
-<img src="images/04_camera_on_robot.svg" alt="Camera on robot setup" class="medium"/>
+See [4.1 Camera on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_0_camera_on_robot/) in the wenglor robot vision manual for setup photos and calibration poses for this case.
 
 ### Camera not on robot
 
-The calibration consists of two steps:
+If the camera is not on the robot, the calibration process consists of two steps:
 
-1. Mount the calibration plate on the robot and teach a minimum of five calibration poses.
-2. Place the calibration plate on the measuring/picking plane and capture one single image (the robot moves to `wDetectionPose` so it does not block the plate).
+| Step | Action |
+| --- | --- |
+| 1 | Mount the calibration plate on the robot and teach a minimum of five calibration poses (e.g. seven to eleven poses for more accurate results). |
+| 2 | Place the calibration plate on the measuring or picking plane and capture a single image. The robot first moves to `wDetectionPose` so it does not block the plate while the user places it. |
 
 ```rapid
 ELSEIF (W_USE_CASE="camera_not_on_robot") THEN
@@ -87,23 +102,19 @@ ELSEIF (W_USE_CASE="camera_not_on_robot") THEN
         calibrateToGround;
 ```
 
-<img src="images/05_camera_not_on_robot.svg" alt="Camera not on robot setup" class="medium"/>
+See [4.2 Camera not on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_2_0_camera_not_on_robot/) in the wenglor robot vision manual for setup photos and calibration poses for this case.
 
 ### Verification
 
-After calibration, `wenglorCalibration.validateCalibration()` performs an optional verification step: it moves the robot TCP to the bottom-left corner of the calibration plate, offset upward by `W_SAFETY_OFFSET_MM`, so the operator can visually confirm accuracy. The calibration plate must not be moved between calibration and verification.
-
-<img src="images/03_calibration_verification.svg" alt="Calibration verification" class="medium"/>
+After calibration, `wenglorCalibration.validateCalibration()` performs an optional verification step to check its accuracy: it moves the robot TCP to the bottom left corner of the calibration plate, offset by the adjustable safety height `W_SAFETY_OFFSET_MM`. The calibration plate must not be moved between the calibration and the verification step. If the results look wrong, check the setup and re-run the calibration. See the verification photos in [4.1 Camera on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_0_camera_on_robot/#calibration-use-case) and [4.2 Camera not on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_2_0_camera_not_on_robot/#calibration-use-case) in the wenglor robot vision manual.
 
 > NOTE
 >
-> For what a good calibration looks like (Z-axis orientation, expected reprojection error values), see the [Calibration Guidelines](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_calibration_guidelines/) in the wenglor robot vision manual.
+> For the verification step, the Z-axis must point to the object plane. The reprojection error shows how good the calibration was. Typical values are 0.1 for ZVZJ calibration plates and 0.5 for printed calibration plates. See [5.1 Basics with Robot Server](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual.
 
 ## Detection
 
-After successful calibration, the program picks objects. With the object position sent by the camera, the robot moves to the object pose.
-
-<img src="images/06_detection.svg" alt="Robot moves to the detected object" class="medium"/>
+After successful calibration, pick your objects. With the object position sent by the camera, the robot moves to the object pose. See the detection photos in [4.1 Camera on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_0_camera_on_robot/#detect-use-case) and [4.2 Camera not on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_2_0_camera_not_on_robot/#detect-use-case) in the wenglor robot vision manual.
 
 ### `singleDetection`
 
@@ -139,7 +150,7 @@ You can extend this with conditional checks on the shape model or additional val
 
 ### `updateReferenceFrame`
 
-Used for mobile platforms and similar use cases (e.g. correcting positional deviations of a mobile platform in front of a machine or shelf). It detects the calibration target, updates `wReferenceFrame`, and — once the machine poses have been taught relative to that frame — moves to them:
+Used for mobile platforms and similar use cases (e.g. to correct positional deviations of a mobile platform in front of a machine or shelf). It detects the calibration target, updates `wReferenceFrame`, and — once the machine poses have been taught relative to that frame — moves to them:
 
 > NOTE
 >
@@ -159,7 +170,18 @@ ENDIF
 MoveL wPoseInMachine,v200,fine,currentToolValue \WObj:=wReferenceFrame;
 ```
 
-On the first run, set the poses relative to `wReferenceFrame`, then set `W_MACHINE_POSES_TAUGHT` to `TRUE` and restart.
+This routine is meant to run twice — once to establish the reference frame, once to use it:
+
+```mermaid
+graph TD
+    Run1(["First run"]) --> Detect1["Detect calibration target,\nupdate wReferenceFrame"]
+    Detect1 --> Taught1{"W_MACHINE_POSES_TAUGHT?"}
+    Taught1 -- FALSE --> Stop["Program stops:\nteach poses relative to wReferenceFrame,\nset W_MACHINE_POSES_TAUGHT := TRUE"]
+    Stop --> Run2(["Restart / second run"])
+    Run2 --> Detect2["Detect calibration target,\nupdate wReferenceFrame"]
+    Detect2 --> Taught2{"W_MACHINE_POSES_TAUGHT?"}
+    Taught2 -- TRUE --> Move["Move to wPoseInMachine\nrelative to wReferenceFrame"]
+```
 
 ## Units and conventions
 

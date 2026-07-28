@@ -1,55 +1,53 @@
 # User Configuration
 
-All parameters you need to adapt to your setup are located in the `wenglorUserConfig.modx` module. Adjust them according to your needs before running the program.
+Adjust the parameters in `wenglorUserConfig.modx` according to your needs.
 
-<img src="images/01_user_config_module.svg" alt="wenglorUserConfig module" class="big"/>
+<img src="images/data_types.png" alt="wenglorUserConfig module" class="uniform-width-600"/>
 
 ## Boolean parameters (`bool`)
 
 | Parameter | Description |
 | --- | --- |
-| `W_MACHINE_POSES_TAUGHT` | Used within the `updateReferenceFrame` use case to stop the program so the related poses for the reference frame can be taught after the initial reference frame was set. After teaching the poses, set this value to `TRUE`. |
+| `W_MACHINE_POSES_TAUGHT` | Used within the `updateReferenceFrame` use case to stop the program, so the related poses for the reference frame can be taught after the initial reference frame was set. After teaching the poses, set this value to `TRUE`. |
 
 ## Numerical parameters (`num`)
 
 | Parameter | Description |
 | --- | --- |
-| `W_SAFETY_OFFSET_MM` | Z offset in millimeters for the validation of the calibration. |
-| `W_VISION_DEVICE_PORT` | Communication port for the Machine Vision Device (by default `32006`). |
-
-## String parameters (`string`)
-
-| Parameter | Description |
-| --- | --- |
-| `W_VISION_DEVICE_IP` | IP address of the Machine Vision Device (by default `192.168.100.1`). |
-| `W_CALIBRATION_JOB` | Name of the uniVision job for calibration. |
-| `W_CALIBRATION_TARGET` | Size of the calibration plate. Select `ZVZJ001` if using ZVZJ005 and `ZVZJ002` if using ZVZJ006. |
-| `W_DETECT_OBJECTS_JOB` | Name of the uniVision job for detection. |
-| `W_DETECT_TARGET_JOB` | Name of the uniVision job for detecting the calibration plate. |
-| `W_USE_CASE` | Defines whether the camera is on the robot or not (`camera_on_robot` or `camera_not_on_robot`). |
-| `W_USER_COMMAND` | The routine to execute (`singleDetection`, `multiDetection`, or `updateReferenceFrame`). |
+| `W_SAFETY_OFFSET_MM` | Specifies the Z offset in millimeters for the validation of the calibration. |
+| `W_VISION_DEVICE_PORT` | Specifies the communication port for the Machine Vision Device (by default `32006`). |
 
 ## Position data (`robtarget`)
 
-<img src="images/02_calibration_poses.svg" alt="Calibration poses" class="medium"/>
-
 | Parameter | Description |
 | --- | --- |
-| `wCalibPose1` … `wCalibPose5` | The calibration poses. For details, see [Robot Program → Calibration](../3_0_robot_program/index.md#calibration). |
-| `wDetectionPose` | The detection pose for object recognition. For **camera on robot**, the detection pose must be identical to the first calibration pose (handled automatically by the program). For **camera not on robot**, the detection pose must be set separately so that the robot arm does not interfere with the camera image. |
-| `wPoseInMachine` | Dummy pose that demonstrates the `updateReferenceFrame` use case. This pose is set relative to `wReferenceFrame`. |
+| `wCalibPose1` to `wCalibPose5` | Defines the calibration poses. For details, see [Robot Program → Calibration](../3_0_robot_program/index.md#calibration) and the [Wenglor Robot Server overview](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual. |
+| `wDetectionPose` | Defines the detection pose for the object recognition. For **camera on robot**, the detection pose must be identical to the first calibration pose (handled automatically by the robot example program). For **camera not on robot**, the detection pose must be set separately so that the robot arm does not interfere with the camera image. This pose is used for the second calibration step and for the detection step. |
+| `wPoseInMachine` | Dummy pose that is used to show the use case for `updateReferenceFrame` and how to use your poses there. This pose is set relative to `wReferenceFrame`. |
 
 ## Speed data (`speeddata`)
 
 | Parameter | Description |
 | --- | --- |
-| `W_CALIB_SPEED` | Speed settings during calibration (in mm/s). |
+| `W_CALIB_SPEED` | Defines the speed settings during calibration (in mm/s). |
+
+## String parameters (`string`)
+
+| Parameter | Description |
+| --- | --- |
+| `W_VISION_DEVICE_IP` | Defines the IP address of the Machine Vision Device (by default `192.168.100.1`). |
+| `W_CALIBRATION_JOB` | Defines the name of the uniVision job for calibration. |
+| `W_CALIBRATION_TARGET` | Defines the size of the calibration plate. Select `ZVZJ001` if using ZVZJ005 and select `ZVZJ002` if using ZVZJ006. |
+| `W_DETECT_OBJECTS_JOB` | Defines the name of the uniVision job for detection. |
+| `W_USE_CASE` | Defines if the camera is on the robot or not (e.g. `camera_on_robot` or `camera_not_on_robot`). |
+| `W_DETECT_TARGET_JOB` | Defines the name of the uniVision job for detecting the calibration plate. |
+| `W_USER_COMMAND` | Defines the routine to execute (`singleDetection`, `multiDetection` or `updateReferenceFrame`). |
 
 ## Reference frame parameters (`wobjdata`)
 
 | Parameter | Description |
 | --- | --- |
-| `wReferenceFrame` | The reference frame that is updated by the `updateReferenceFrame` routine, and to which all machine poses shall be taught so they can be updated together with the reference frame. |
+| `wReferenceFrame` | The reference frame updated by the `updateReferenceFrame` routine. Teach all poses in the machine relative to this frame so they update together with it. For details, see the [Wenglor Robot Server overview](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual. |
 
 ## Example
 
@@ -85,4 +83,6 @@ CONST speeddata W_CALIB_SPEED:=v100;
 
 > NOTE
 >
-> Also check that **ABB** is selected in the robot manufacturer drop-down of the robot server on the Machine Vision Device website (e.g. B60, MVC). See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_2_0_settings_on_device_website/) in the wenglor robot vision manual.
+> Also check that **ABB** is selected in the robot manufacturer drop-down of the robot server on the Machine Vision Device website (e.g. B60, MVC). See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_3_0_settings_on_device_website/) in the wenglor robot vision manual.
+>
+> Once the configuration matches your setup, load the program "Generic wenglor vision interface" — see [Installation & Setup](../1_0_installation/index.md).

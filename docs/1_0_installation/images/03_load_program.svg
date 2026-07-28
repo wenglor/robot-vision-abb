@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
-  <rect width="800" height="450" fill="#eef3f7" stroke="#00619e" stroke-width="3" stroke-dasharray="12 8"/>
-  <text x="400" y="200" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#00619e" text-anchor="middle" font-weight="bold">Placeholder image</text>
-  <text x="400" y="245" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#33607d" text-anchor="middle">Load program - Generic wenglor vision interface</text>
-  <text x="400" y="420" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#7d97a8" text-anchor="middle">Replace with a screenshot from RobotStudio / uniVision</text>
-</svg>

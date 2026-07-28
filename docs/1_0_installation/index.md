@@ -1,40 +1,44 @@
 # Installation & Setup
 
-The ABB robot vision example is a set of RAPID modules bundled in a program file (`.pgf`). Before loading it, prepare the robot controller and the network connection to the Machine Vision Device.
+The robot vision example for ABB consists of the following files, available in the [sources](https://github.com/wenglor/robot-vision-abb/tree/main/sources) directory of this repository:
+
+| File | Contents |
+| --- | --- |
+| `Generic wenglor vision interface.pgf` | Program file that references the modules below. |
+| `wenglorUserConfig.modx` | User configuration (IP, port, poses, jobs, use case). |
+| `wenglorGlobal.modx` | Core and helper functions (socket communication, conversions). |
+| `wenglorCalibration.modx` | Hand-eye calibration and verification. |
+| `wenglorDetect.modx` | Object detection and movement to detected objects. |
+
+Copy these files to the robot controller, e.g. to `/HOME` or `/HOME/<project_folder>`.
 
 ## Supported controllers
 
-| Controller | Minimum software version | Notes |
+| Controller | Minimum software version | Additional steps |
 | --- | --- | --- |
-| OmniCore | RobotWare 7.3.2 | Runs the `.modx` files directly. |
-| IRC5 | RobotWare 5.15 | Rename module files from `.modx` to `.mod`, adjust the references inside the `.pgf` file accordingly, and activate the option **PC Interface**. |
+| OmniCore | RobotWare 7.3.2 | None — run the `.modx` files as-is. |
+| IRC5 | RobotWare 5.15 | Rename the module files from `.modx` to `.mod`, update the corresponding references within the PGF file, and activate the **PC Interface** option. |
 
-## Files
-
-Download the robot example from [www.wenglor.com/product/DNNF023](https://www.wenglor.com/product/DNNF023) → Downloads → Programming examples and configuration files → Examples_Robot_Vision. It consists of:
-
-- `Generic wenglor vision interface.pgf` — the program file that references the modules.
-- `wenglorUserConfig.modx` — user configuration (IP, port, poses, jobs, use case). See [User Configuration](../2_0_user_configuration/index.md).
-- `wenglorGlobal.modx` — core and helper functions (socket communication, conversions).
-- `wenglorCalibration.modx` — hand-eye calibration and verification.
-- `wenglorDetect.modx` — object detection and movement to detected objects.
+<img src="images/icr5_renaming.png" alt="icr5_renaming" class="uniform-width-800"/>
 
 ## Network configuration in RobotStudio
 
-In the ABB software **RobotStudio**, adjust the network settings of the ABB robot controller for the public network so it can reach the Machine Vision Device (by default `192.168.100.1`).
+In the ABB software **RobotStudio**, adjust the network settings of the ABB robot controller for the public network and make sure that **RapidSockets** is set to `YES` (Communication → Firewall Manager).
 
-<img src="images/01_robotstudio_network_settings.svg" alt="RobotStudio network settings" class="big"/>
+<img src="images/pc_interface-requirement.png" alt="Enable PC interface option" class="uniform-width-600"/>
 
-Make sure that **RapidSockets** is set to `YES` (Communication → Firewall Manager). Without this setting, the socket communication used by the example will not work.
-
-<img src="images/02_rapidsockets_firewall.svg" alt="RapidSockets set to YES in Firewall Manager" class="big"/>
+<img src="images/rapid_sockets_requirement.png" alt="RapidSockets set to YES in Firewall Manager" class="uniform-width-800"/>
 
 > NOTE
 >
-> On the Machine Vision Device website (Tab `Jobs` → `Robot Server`), make sure the robot server is active and the robot manufacturer is set to **ABB**. See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_2_0_settings_on_device_website/) in the wenglor robot vision manual.
+> On the Machine Vision Device website (Tab `Jobs` → `Robot Server`), make sure the robot server is active and the robot manufacturer is set to **ABB**. See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_3_0_settings_on_device_website/) in the wenglor robot vision manual.
 
 ## Loading the program
 
-After updating the [user configuration](../2_0_user_configuration/index.md) to match your setup, load the program **Generic wenglor vision interface**. The program is then ready to be executed.
+Adjust the parameters in `wenglorUserConfig.modx` to match your setup — see [User Configuration](../2_0_user_configuration/index.md). Once the user configuration is updated, load the program **Generic wenglor vision interface**. It is then ready to be executed.
 
-<img src="images/03_load_program.svg" alt="Load the Generic wenglor vision interface program" class="medium"/>
+<img src="images/loading_the_program.png" alt="Load the Generic wenglor vision interface program" class="uniform-width-600"/>
+
+> NOTE
+>
+> For details about the communication to the robot server, see [Generic Robot Vision API](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_7_0_generic_robot_vision_interface/) in the wenglor robot vision manual.
