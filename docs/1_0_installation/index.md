@@ -5,7 +5,7 @@ The robot vision example for ABB consists of the following files, available in t
 | File | Contents |
 | --- | --- |
 | `Generic wenglor vision interface.pgf` | Program file that references the modules below. |
-| `wenglorUserConfig.modx` | User configuration (IP, port, poses, jobs, use case). |
+| `wenglorUserConfig.modx` | User configuration (IP, port, poses, jobs, use case). See [User Configuration](../2_0_user_configuration/index.md). |
 | `wenglorGlobal.modx` | Core and helper functions (socket communication, conversions). |
 | `wenglorCalibration.modx` | Hand-eye calibration and verification. |
 | `wenglorDetect.modx` | Object detection and movement to detected objects. |
@@ -19,7 +19,7 @@ Copy these files to the robot controller, e.g. to `/HOME` or `/HOME/<project_fol
 | OmniCore | RobotWare 7.3.2 | None — run the `.modx` files as-is. |
 | IRC5 | RobotWare 5.15 | Rename the module files from `.modx` to `.mod`, update the corresponding references within the PGF file, and activate the **PC Interface** option. |
 
-<img src="images/icr5_renaming.png" alt="icr5_renaming" class="uniform-width-800"/>
+<img src="images/irc5_renaming.png" alt="irc5_renaming" class="uniform-width-800"/>
 
 ## Network configuration in RobotStudio
 

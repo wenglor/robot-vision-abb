@@ -2,7 +2,7 @@
 
 **Version:** 1.2.0
 
-This repository demonstrates how to use the Generic Vision Interface with wenglor vision devices on a ABB controller. The included `.modx` and `.pgf` files form a working sample program [Generic wenglor vision interface.pgf](sources/Generic%20wenglor%20vision%20interface.pgf) that you can adopt and customize for your application.
+This repository demonstrates how to use the Generic Vision Interface with wenglor vision devices on an ABB controller. The included `.modx` and `.pgf` files form a working sample program [Generic wenglor vision interface.pgf](sources/Generic%20wenglor%20vision%20interface.pgf) that you can adopt and customize for your application.
 
 > NOTE
 >
@@ -14,11 +14,12 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
 
 ## Table of Contents
 
-1. [Installation & Setup](docs/1_0_installation/index.md)
-2. [User Configuration](docs/2_0_user_configuration/index.md)
-3. [Robot Program](docs/3_0_robot_program/index.md)
-4. [Troubleshooting](docs/4_0_troubleshooting/index.md)
-5. [Support & Feedback](docs/5_0_support_and_feedback/index.md)
+- [Prerequisites](#prerequisites)
+- [Files](#files)
+- [Installation](#installation)
+- [Running the Sample Program](#running-the-sample-program)
+- [Troubleshooting](#troubleshooting)
+- [Support & Feedback](#support--feedback)
 
 > NOTE
 >
@@ -50,10 +51,14 @@ The [sources](sources) directory of this repository contains:
 | `wenglorCalibration.modx` | Hand-eye calibration and verification. |
 | `wenglorDetect.modx` | Object detection and movement to detected objects. |
 
+---
+
 ## Installation
 
 1. Get the files from the [sources](sources) directory and copy them to the robot controller (e.g. `/HOME` or `/HOME/<project_folder>`).
 2. Follow the [user configuration](docs/2_0_user_configuration/index.md) steps.
+
+---
 
 ## Running the Sample Program
 
@@ -73,6 +78,6 @@ See the [Troubleshooting](docs/4_0_troubleshooting/index.md) page for insufficie
 
 ## Support & Feedback
 
-- **Bugs**: Please open a new Issue in the [GitHub Issues section](https://github.com/wenglor/robot-vision-abb/issues) if needed.
-- **Feature Requests & Ideas**: Discuss suggestions in the Discussions → Ideas category under [GitHub Discussions](https://github.com/wenglor/robot-vision-abb/discussions).
-- **Product page**: [www.wenglor.com/product/DNNF023](https://www.wenglor.com/product/DNNF023) — uniVision 3 software, device firmware, and operating instructions. The RAPID example files themselves are in this repository's [sources](sources) directory.
+- **Bugs:** Please open a new Issue in the [GitHub Issues section](https://github.com/wenglor/robot-vision-abb/issues) if needed.
+- **Feature Requests & Ideas:** Discuss suggestions in the Discussions → Ideas category under [GitHub Discussions](https://github.com/wenglor/robot-vision-abb/discussions).
+- **Product page:** [www.wenglor.com/product/DNNF023](https://www.wenglor.com/product/DNNF023) — uniVision 3 software, device firmware, and operating instructions. The RAPID example files themselves are in this repository's [sources](sources) directory.

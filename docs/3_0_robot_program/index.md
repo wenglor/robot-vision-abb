@@ -53,7 +53,7 @@ Calibrate robot and camera via several calibration poses, where the camera looks
 
 > NOTE
 >
-> For the general calibration concepts — which calibration plate to use, how to choose and vary the poses, and how to read the reprojection error — see [5.1 Basics with Robot Server](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual. The description here does not repeat them.
+> For the general calibration concepts — which calibration plate to use, how to choose and vary the poses, and how to read the reprojection error — see [4. Wenglor Robot Server](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual. The description here does not repeat them.
 
 The poses are taught in `wenglorUserConfig.modx` (`wCalibPose1` … `wCalibPose5`); the example moves through them in `wenglorCalibration.runCalibration()`, calling `calibration:add` at each pose. For the most accurate results, make the difference between one pose and the next as large as possible — vary the pose angles as much as you can, since motions with non-parallel rotation axes give the best calibration. See the example calibration poses in [4.1 Camera on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_1_0_camera_on_robot/#calibration-use-case) and [4.2 Camera not on Robot](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_2_0_camera_not_on_robot/#calibration-use-case) in the wenglor robot vision manual.
 
@@ -110,7 +110,7 @@ After calibration, `wenglorCalibration.validateCalibration()` performs an option
 
 > NOTE
 >
-> For the verification step, the Z-axis must point to the object plane. The reprojection error shows how good the calibration was. Typical values are 0.1 for ZVZJ calibration plates and 0.5 for printed calibration plates. See [5.1 Basics with Robot Server](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual.
+> For the verification step, the Z-axis must point to the object plane. The reprojection error shows how good the calibration was. Typical values are 0.1 for ZVZJ calibration plates and 0.5 for printed calibration plates. See [4. Wenglor Robot Server](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual.
 
 ## Detection
 

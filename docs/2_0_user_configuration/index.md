@@ -37,7 +37,7 @@ Adjust the parameters in `wenglorUserConfig.modx` according to your needs.
 | --- | --- |
 | `W_VISION_DEVICE_IP` | Defines the IP address of the Machine Vision Device (by default `192.168.100.1`). |
 | `W_CALIBRATION_JOB` | Defines the name of the uniVision job for calibration. |
-| `W_CALIBRATION_TARGET` | Defines the size of the calibration plate. Select `ZVZJ001` if using ZVZJ005 and select `ZVZJ002` if using ZVZJ006. |
+| `W_CALIBRATION_TARGET` | Defines the size of the calibration plate. Select `zvzj001` if using zvzj005 and select `zvzj002` if using zvzj006. |
 | `W_DETECT_OBJECTS_JOB` | Defines the name of the uniVision job for detection. |
 | `W_USE_CASE` | Defines if the camera is on the robot or not (e.g. `camera_on_robot` or `camera_not_on_robot`). |
 | `W_DETECT_TARGET_JOB` | Defines the name of the uniVision job for detecting the calibration plate. |
