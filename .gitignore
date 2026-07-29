@@ -1,2 +1,10 @@
+# Build output
 site/
+.cache/
+
+# Shared working context (not part of the published repo)
 context/*
+
+# AI assistant instructions (must not be published on the public docs repo)
+CLAUDE.md
+.claude/

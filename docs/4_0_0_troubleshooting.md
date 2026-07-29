@@ -1,4 +1,4 @@
-# Troubleshooting
+# 4. Troubleshooting
 
 Quick reference — jump to the matching symptom below for details:
 

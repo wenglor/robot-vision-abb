@@ -1,4 +1,4 @@
-# User Configuration
+# 2. User Configuration
 
 Adjust the parameters in `wenglorUserConfig.modx` according to your needs.
 
@@ -6,24 +6,36 @@ Adjust the parameters in `wenglorUserConfig.modx` according to your needs.
 
 ## Boolean parameters (`bool`)
 
+/// html | div.col-widths
+    attrs: {style: "--w1: 30%; --w2: 70%;"}
+
 | Parameter | Description |
 | --- | --- |
 | `W_MACHINE_POSES_TAUGHT` | Used within the `updateReferenceFrame` use case to stop the program, so the related poses for the reference frame can be taught after the initial reference frame was set. After teaching the poses, set this value to `TRUE`. |
+///
 
 ## Numerical parameters (`num`)
+
+/// html | div.col-widths
+    attrs: {style: "--w1: 25%; --w2: 75%;"}
 
 | Parameter | Description |
 | --- | --- |
 | `W_SAFETY_OFFSET_MM` | Specifies the Z offset in millimeters for the validation of the calibration. |
 | `W_VISION_DEVICE_PORT` | Specifies the communication port for the Machine Vision Device (by default `32006`). |
+///
 
 ## Position data (`robtarget`)
 
+/// html | div.col-widths
+    attrs: {style: "--w1: 25%; --w2: 75%;"}
+
 | Parameter | Description |
 | --- | --- |
-| `wCalibPose1` to `wCalibPose5` | Defines the calibration poses. For details, see [Robot Program → Calibration](../3_0_robot_program/index.md#calibration) and the [Wenglor Robot Server overview](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual. |
+| `wCalibPose1` to `wCalibPose5` | Defines the calibration poses. For details, see [Robot Program → Calibration](3_0_0_robot_program.md#calibration) and the [Wenglor Robot Server overview](https://wenglor.github.io/robot-vision-generic-string/4_0_0_robot_vision_server/) in the wenglor robot vision manual. |
 | `wDetectionPose` | Defines the detection pose for the object recognition. For **camera on robot**, the detection pose must be identical to the first calibration pose (handled automatically by the robot example program). For **camera not on robot**, the detection pose must be set separately so that the robot arm does not interfere with the camera image. This pose is used for the second calibration step and for the detection step. |
 | `wPoseInMachine` | Dummy pose that is used to show the use case for `updateReferenceFrame` and how to use your poses there. This pose is set relative to `wReferenceFrame`. |
+///
 
 ## Speed data (`speeddata`)
 
@@ -32,6 +44,9 @@ Adjust the parameters in `wenglorUserConfig.modx` according to your needs.
 | `W_CALIB_SPEED` | Defines the speed settings during calibration (in mm/s). |
 
 ## String parameters (`string`)
+
+/// html | div.col-widths
+    attrs: {style: "--w1: 25%; --w2: 75%;"}
 
 | Parameter | Description |
 | --- | --- |
@@ -42,12 +57,17 @@ Adjust the parameters in `wenglorUserConfig.modx` according to your needs.
 | `W_USE_CASE` | Defines if the camera is on the robot or not (e.g. `camera_on_robot` or `camera_not_on_robot`). |
 | `W_DETECT_TARGET_JOB` | Defines the name of the uniVision job for detecting the calibration plate. |
 | `W_USER_COMMAND` | Defines the routine to execute (`singleDetection`, `multiDetection` or `updateReferenceFrame`). |
+///
 
 ## Reference frame parameters (`wobjdata`)
+
+/// html | div.col-widths
+    attrs: {style: "--w1: 25%; --w2: 75%;"}
 
 | Parameter | Description |
 | --- | --- |
 | `wReferenceFrame` | The reference frame updated by the `updateReferenceFrame` routine. Teach all poses in the machine relative to this frame so they update together with it. For details, see the [Wenglor Robot Server overview](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual. |
+///
 
 ## Example
 
@@ -81,8 +101,8 @@ CONST num W_SAFETY_OFFSET_MM:=10;
 CONST speeddata W_CALIB_SPEED:=v100;
 ```
 
-> NOTE
->
-> Also check that **ABB** is selected in the robot manufacturer drop-down of the robot server on the Machine Vision Device website (e.g. B60, MVC). See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_3_0_settings_on_device_website/) in the wenglor robot vision manual.
->
-> Once the configuration matches your setup, load the program "Generic wenglor vision interface" — see [Installation & Setup](../1_0_installation/index.md).
+!!! note
+
+    Also check that **ABB** is selected in the robot manufacturer drop-down of the robot server on the Machine Vision Device website (e.g. B60, MVC). See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_3_0_settings_on_device_website/) in the wenglor robot vision manual.
+
+    Once the configuration matches your setup, load the program "Generic wenglor vision interface" — see [Installation & Setup](1_0_0_installation.md).
