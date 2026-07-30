@@ -66,7 +66,7 @@ Adjust the parameters in `wenglorUserConfig.modx` according to your needs.
 
 | Parameter | Description |
 | --- | --- |
-| `wReferenceFrame` | The reference frame updated by the `updateReferenceFrame` routine. Teach all poses in the machine relative to this frame so they update together with it. For details, see the [Wenglor Robot Server overview](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) in the wenglor robot vision manual. |
+| `wReferenceFrame` | The reference frame updated by the `updateReferenceFrame` routine. Teach all poses in the machine relative to this frame so they update together with it. For details, see the [Wenglor Robot Server overview](https://wenglor.github.io/robot-vision-generic-string/4_0_0_robot_vision_server/) in the wenglor robot vision manual. |
 ///
 
 ## Example
@@ -103,6 +103,6 @@ CONST speeddata W_CALIB_SPEED:=v100;
 
 !!! note
 
-    Also check that **ABB** is selected in the robot manufacturer drop-down of the robot server on the Machine Vision Device website (e.g. B60, MVC). See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_3_0_settings_on_device_website/) in the wenglor robot vision manual.
+    Also check that **ABB** is selected in the robot manufacturer drop-down of the robot server on the Machine Vision Device website (e.g. B60, MVC). See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_3_0_settings_on_device_website/) in the wenglor robot vision manual.
 
     Once the configuration matches your setup, load the program "Generic wenglor vision interface" — see [Installation & Setup](1_0_0_installation.md).

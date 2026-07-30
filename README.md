@@ -23,7 +23,7 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
 
 > NOTE
 >
-> The generic robot vision API (commands, return values, error codes), the calibration guidelines, and the uniVision job setup are documented once in the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/) and are **not** repeated here. This repository only describes how the ABB example uses them.
+> The generic robot vision API (commands, return values, error codes), the calibration guidelines, and the uniVision job setup are documented once in the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/4_0_0_robot_vision_server/) and are **not** repeated here. This repository only describes how the ABB example uses them.
 
 ---
 
@@ -46,7 +46,7 @@ The [sources](sources) directory of this repository contains:
 | File | Contents |
 | --- | --- |
 | `Generic wenglor vision interface.pgf` | Program file that references the modules below. |
-| `wenglorUserConfig.modx` | User configuration (IP, port, poses, jobs, use case). See [User Configuration](docs/2_0_user_configuration/index.md). |
+| `wenglorUserConfig.modx` | User configuration (IP, port, poses, jobs, use case). See [User Configuration](docs/2_0_0_user_configuration.md). |
 | `wenglorGlobal.modx` | Core and helper functions (socket communication, conversions). |
 | `wenglorCalibration.modx` | Hand-eye calibration and verification. |
 | `wenglorDetect.modx` | Object detection and movement to detected objects. |
@@ -56,7 +56,7 @@ The [sources](sources) directory of this repository contains:
 ## Installation
 
 1. Get the files from the [sources](sources) directory and copy them to the robot controller (e.g. `/HOME` or `/HOME/<project_folder>`).
-2. Follow the [user configuration](docs/2_0_user_configuration/index.md) steps.
+2. Follow the [user configuration](docs/2_0_0_user_configuration.md) steps.
 
 ---
 
@@ -66,13 +66,13 @@ The [sources](sources) directory of this repository contains:
 2. Select the TCP used for calibration in the FlexPendant.
 3. Execute the program and monitor the messages on the FlexPendant display.
 
-For details on the program flow (calibration, single/multi detection, reference frame updates), see [Robot Program](docs/3_0_robot_program/index.md).
+For details on the program flow (calibration, single/multi detection, reference frame updates), see [Robot Program](docs/3_0_0_robot_program.md).
 
 ---
 
 ## Troubleshooting
 
-See the [Troubleshooting](docs/4_0_troubleshooting/index.md) page for insufficient calibration accuracy, height offsets in detected poses, communication errors, device error codes, and unexpected program exits.
+See the [Troubleshooting](docs/4_0_0_troubleshooting.md) page for insufficient calibration accuracy, height offsets in detected poses, communication errors, device error codes, and unexpected program exits.
 
 ---
 

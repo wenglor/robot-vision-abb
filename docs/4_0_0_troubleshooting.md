@@ -17,7 +17,7 @@ Quick reference — jump to the matching symptom below for details:
 | Number of calibration poses | Teach more than five (e.g. seven to eleven give more accurate results). Follow the naming scheme and extend the pose sequence in `wenglorCalibration.runCalibration()`. |
 | Pose variation | Vary the pose angles as much as possible — motions with non-parallel rotation axes give the most accurate results. |
 | Calibration plate visibility | Make sure the plate covers as much of the camera image as possible and is fully visible. |
-| Calibration plate type | Prefer the wenglor calibration plate ZVZJ over a printed version — its reprojection error is typically five times smaller. If printing, print the PDF at actual size on flat, stiff material. |
+| Calibration plate type | Prefer the wenglor ZVZJ calibration plate over a printed version — its reprojection error is typically five times smaller. If printing, print the PDF at actual size on flat, stiff material. |
 | Reprojection error | Check the value returned by `calibration:calculate`. Typical values are `0.1` for ZVZJ calibration plates and `0.5` for printed ones — higher values indicate a poor calibration. |
 
 ## Height offset in detected poses
@@ -38,7 +38,7 @@ Quick reference — jump to the matching symptom below for details:
 
 ## Error codes returned by the device
 
-If the robot server returns a negative error code (`-5001` … `-5010`), the example maps it to a readable message in `wenglorGlobal.setReturnError` and shows it on the FlexPendant before exiting. For the meaning of each code, see the [Generic Robot Vision Interface → Error codes](https://wenglor.github.io/robot-vision-generic-string/4_0_robot_vision_server/4_7_0_generic_robot_vision_interface/#error-codes) in the wenglor robot vision manual.
+If the robot server returns a negative error code (`-5001` … `-5010`), the example maps it to a readable message in `wenglorGlobal.setReturnError` and shows it on the FlexPendant before exiting. For the meaning of each code, see the [Generic Robot Vision Interface → Error codes](https://wenglor.github.io/robot-vision-generic-string/4_7_0_generic_robot_vision_interface/#error-codes) in the wenglor robot vision manual.
 
 ## Program exits unexpectedly
 
