@@ -5,17 +5,16 @@ MODULE wenglorGlobal
     !
     ! Author: wenglor sensoric GmbH
     !
-    ! Version: 1.1.0
+    ! Version: 1.2.0
     !
     ! Description:
-    !   This is the module that manages all used functions
+    !   This module provides all core and helper functions shared with the calibration and detection modules.
     !
     !***********************************************************
 
     CONST string WENGLOR_MESSAGE_HEADER:="wenglor vision";
     LOCAL VAR socketdev visionSocket;
     LOCAL VAR num retryNo:=0;
-    LOCAL VAR string returnError:="";
     VAR bool wenglorCalibDone:=FALSE;
 
     ! ************Socket interaction helper functions***********
@@ -23,8 +22,8 @@ MODULE wenglorGlobal
     PROC recoverConnection()
         SocketClose visionSocket;
         SocketCreate visionSocket;
-        SocketConnect visionSocket,WENGLOR_IP_ADDRESS,WENGLOR_CAM_PORT,\Time:=3.0;
-    ERROR
+        SocketConnect visionSocket,W_VISION_DEVICE_IP,W_VISION_DEVICE_PORT,\Time:=3.0;
+        ERROR
         IF ERRNO=ERR_SOCK_TIMEOUT THEN
             IF retryNo<5 THEN
                 WaitTime 1;
@@ -41,15 +40,15 @@ MODULE wenglorGlobal
         ENDIF
     ENDPROC
 
-    FUNC string readString()
+    FUNC string receiveResponse()
         VAR string reply;
         SocketReceive visionSocket,\Str:=reply;
         reply := removeNewLine(reply);
         RETURN reply;
-    ERROR
+        ERROR
         IF ERRNO=ERR_SOCK_TIMEOUT THEN
             RETRY;
-        ELSEIF ERRNO=ERR_SOCK_CLOSED OR ERRNO=ERR_SOCK_NOT_CONN THEN
+        ELSEIF ERRNO=ERR_SOCK_CLOSED THEN
             recoverConnection;
             RETRY;
         ELSE
@@ -57,12 +56,12 @@ MODULE wenglorGlobal
         ENDIF
     ENDFUNC
 
-    PROC sendString(string message)
+    PROC sendCommand(string message)
         SocketSend visionSocket,\Str:=message;
-    ERROR
+        ERROR
         IF ERRNO=ERR_SOCK_TIMEOUT THEN
             RETRY;
-        ELSEIF ERRNO=ERR_SOCK_CLOSED OR ERRNO=ERR_SOCK_NOT_CONN THEN
+        ELSEIF ERRNO=ERR_SOCK_CLOSED THEN
             recoverConnection;
             RETRY;
         ENDIF
@@ -70,10 +69,9 @@ MODULE wenglorGlobal
 
     FUNC string sendAndReadString(string message)
         VAR string reply;
-        sendString(message);
-        SocketReceive visionSocket,\Str:=reply;
-        reply := removeNewLine(reply);
-        ! Update return error message in case of an error
+        sendCommand(message);
+        reply := receiveResponse();
+        ! Update and return the error message in case of an error.
         checkCameraReply(reply);
         RETURN reply;
     ENDFUNC
@@ -86,19 +84,30 @@ MODULE wenglorGlobal
     !***********************************************************
     ! *********END Socket interaction helper functions**********
 
+    PROC warningMessage(string message)
+        UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,message,\Buttons:=btnOK,\Icon:=iconWarning;
+    ENDPROC
+
+    PROC infoMessage(string message)
+        UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,message,\Buttons:=btnOK,\Icon:=iconInfo;
+    ENDPROC
+
+    FUNC btnres userDialog(string message)
+        VAR btnres answer:=0;
+        UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,message,\Buttons:=btnOKCancel,\Icon:=iconInfo,\Result:=answer;
+        RETURN answer;
+    ENDFUNC
 
     PROC updateCameraState()
         VAR string camResponse;
         VAR num stringLength;
 
-        camResponse:=sendAndReadString("state["+WENGLOR_USE_CASE+"];");
+        camResponse:=sendAndReadString("state["+W_USE_CASE+"];");
         stringLength:=StrLen(camResponse);
 
         ! The first bit defines if there is a camera error
-        IF StrMemb(camResponse,1,"0") THEN
-            returnError:="";
-        ELSE
-            returnError:="camera in error state";
+        IF StrMemb(camResponse,1,"1") THEN
+            warningMessage("Camera in error. Check at http://" + W_VISION_DEVICE_IP + "/#/jobs.");
         ENDIF
 
         ! The second bit defines if the calibration data is available
@@ -109,48 +118,58 @@ MODULE wenglorGlobal
         ENDIF
     ENDPROC
 
-    PROC setReturnError(VAR num errorCode)
-        VAR num errorCodeAbs;
-        ! Error handling, which error codes to use?
-        errorCodeAbs:=Abs(errorCode);
-        IF errorCodeAbs=5001 THEN
-            returnError:="General Error";
-        ELSEIF errorCodeAbs=5002 THEN
-            returnError:="Badly formatted request";
-        ELSEIF errorCodeAbs=5003 THEN
-            returnError:="No connnection to univision";
-        ELSEIF errorCodeAbs=5004 THEN
-            returnError:="Unknown univision job name";
-        ELSEIF errorCodeAbs=5005 THEN
-            returnError:="Badly configured univision job";
-        ELSEIF errorCodeAbs=5006 THEN
-            returnError:="Calibration failed";
-        ELSEIF errorCodeAbs=5007 THEN
-            returnError:="No calibration data";
-        ELSEIF errorCodeAbs=5008 THEN
-            returnError:="No object found";
-        ELSEIF errorCodeAbs=5009 THEN
-            returnError:="Bad device robot vision message";
-        ELSEIF errorCodeAbs=5010 THEN
-            returnError:="Index error";
-        ELSE
-            returnError:="Unknown error code";
-        ENDIF
-        UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,ValToStr(errorCodeAbs)+": "+returnError,\Buttons:=btnOK\Icon:=iconWarning;
+    PROC loadJob(string jobName)
+        sendSimpleCommand("job:change["+jobName+"];");
     ENDPROC
 
-    FUNC string replaceParantheses(string message)
+    FUNC string getJob()
+        RETURN sendAndReadString("job:get;");
+    ENDFUNC
+
+    PROC setReturnError(num errorCode)
+        VAR num errorCodeAbs;
+        VAR string errorMsg;
+        ! Error handling: known error codes.
+        errorCodeAbs:=Abs(errorCode);
+        IF errorCodeAbs=5001 THEN
+            errorMsg:="General Error";
+        ELSEIF errorCodeAbs=5002 THEN
+            errorMsg:="Badly formatted request";
+        ELSEIF errorCodeAbs=5003 THEN
+            errorMsg:="No connection to uniVision";
+        ELSEIF errorCodeAbs=5004 THEN
+            errorMsg:="Unknown uniVision job name";
+        ELSEIF errorCodeAbs=5005 THEN
+            errorMsg:="Badly configured uniVision job";
+        ELSEIF errorCodeAbs=5006 THEN
+            errorMsg:="Calibration failed";
+        ELSEIF errorCodeAbs=5007 THEN
+            errorMsg:="No calibration data";
+        ELSEIF errorCodeAbs=5008 THEN
+            errorMsg:="No object found";
+        ELSEIF errorCodeAbs=5009 THEN
+            errorMsg:="Bad device robot vision message";
+        ELSEIF errorCodeAbs=5010 THEN
+            errorMsg:="Index error";
+        ELSE
+            errorMsg:="Unknown error code";
+        ENDIF
+        warningMessage(ValToStr(errorCodeAbs)+": "+errorMsg);
+        EXIT;
+    ENDPROC
+
+    LOCAL FUNC string replaceParantheses(string message)
         VAR num begin;
         VAR num end;
         VAR num length;
         VAR string content;
         length:=StrLen(message);
-        ! Increment begin by 1 to skip the match, which is the parantheses itself
+        ! Increment begin by 1 to skip the match, which is the parenthesis itself.
         begin:=StrFind(message,1,"(")+1;
         end:=StrFind(message,1,")");
 
         content:=StrPart(message,begin,end-begin);
-        ! StrFind return len + 1 no key was not found, therefore compare with string length
+        ! StrFind returns len + 1 if no key was found, therefore compare with string length.
         IF ((begin>length) OR (end>length)) THEN
             RETURN "";
         ENDIF
@@ -158,15 +177,18 @@ MODULE wenglorGlobal
         RETURN "["+content+"]";
     ENDFUNC
 
-    ! Receiveds an already formatted string to convert it to a robtarget type
-    FUNC robtarget stringToPose(string formattedString)
+    ! Receives an already formatted string and converts it to a robtarget.
+    FUNC robtarget stringToPose(string message)
         VAR num objectPoseCam{6};
         VAR bool parsingSuccessful;
         VAR pose objPose;
         VAR robtarget currentTarget;
+        VAR string formattedString;
 
         VAR robtarget objectPose;
         VAR robtarget errorPose;
+
+        formattedString:=replaceParantheses(message);
 
         currentTarget:=CRobT();
 
@@ -175,7 +197,7 @@ MODULE wenglorGlobal
         ENDIF
         parsingSuccessful:=StrToVal(formattedString,objectPoseCam);
         IF (parsingSuccessful=FALSE) THEN
-            ! When parsing is failing, then there might is an error case, so set error message in generic procedure
+            ! If parsing fails, it may be an error case, so set the error message in the generic procedure.
             checkCameraReply(formattedString);
             RETURN currentTarget;
         ENDIF
@@ -195,25 +217,21 @@ MODULE wenglorGlobal
         VAR num errorCode;
         VAR num errorCodeAbs;
 
-        returnError:="";
-
         IF (StrLen(replyMsg)=0) THEN
-            ! There should be always a camera reply
-            returnError:="General Error";
-            RETURN ;
-        ENDIF
-
-        parsingOk:=StrToVal(replyMsg,errorCode);
-        IF (parsingOk=FALSE) THEN
-            ! Parsing will also fail when reading the object pose, after wenglorDetection. The detect object routine will reset the error then
-            returnError:="General Error";
-            RETURN ;
-        ENDIF
-
-        IF ((parsingOk=FALSE) OR (errorCode<0)) THEN
-            setReturnError errorCode;
-            ! If there is an error, stop the programm execution
+            ! There should always be a camera reply.
+            warningMessage("No reply from camera. Exiting program.");
             EXIT;
+        ENDIF
+
+        IF (StrMemb(replyMsg,1,"-")) THEN
+            ! A return value with a negative error code is expected in case of an error
+            parsingOk:=StrToVal(replyMsg,errorCode);
+            IF (parsingOk) THEN
+                setReturnError errorCode;
+            ELSE
+                warningMessage("Could not parse camera error code. Exiting program.");
+                EXIT;
+            ENDIF
         ENDIF
     ENDPROC
 
@@ -265,7 +283,7 @@ MODULE wenglorGlobal
         RETURN ;
     ENDPROC
 
-    ! Convert rotation vector to quaternions representation
+    ! Convert a rotation vector to quaternion representation.
     FUNC orient rotVecToQuat(num rxRad,num ryRad,num rzRad)
         VAR num thetaDeg;
         VAR num thetaRad;
@@ -284,7 +302,7 @@ MODULE wenglorGlobal
             RETURN quat;
         ENDIF
 
-        !Normalize the rotation vector
+        ! Normalize the rotation vector.
         ux:=rxRad/thetaRad;
         uy:=ryRad/thetaRad;
         uz:=rzRad/thetaRad;
@@ -306,7 +324,7 @@ MODULE wenglorGlobal
         
         ! Search for the newline characters and remove them
         newLinePos := StrFind(receivedMessage,1, searchKey);
-        ! StrFind will return string length + 1 in case nothing was found 
+        ! StrFind will return string length + 1 in case nothing was found
         IF newLinePos <= StrLen(receivedMessage) THEN
             receivedMessage := StrPart(receivedMessage,1, newLinePos - StrLen(searchKey));
         ENDIF
@@ -314,7 +332,7 @@ MODULE wenglorGlobal
         
     ENDFUNC
 
-    ! Reads the current robot TCP and prepares its format to be send to the camera
+    ! Reads the current robot TCP and prepares the format to be sent to the camera.
     FUNC string getRobPos()
         VAR robtarget robTar;
         VAR num robotPose{6};

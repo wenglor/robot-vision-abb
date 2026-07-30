@@ -6,95 +6,33 @@ MODULE wenglorDetect
     !
     ! Author: wenglor sensoric GmbH
     !
-    ! Version: 1.1.0
+    ! Version: 1.2.0
     !
     ! Description:
-    !   This is the module that manages the actual object wenglorDetection and movement to the objects.
+    !   This module handles object detection at wDetectionPose and movement to detected objects.
     !
     !***********************************************************
 
-    PROC main()
-        VAR btnres answer;
-        VAR robtarget objectPose;
+    FUNC robtarget detectTarget()
+        VAR string cameraReply;
 
-        ! update current tool
-        GetSysData currentToolValue;
+         cameraReply:=sendAndReadString("target:pose["+W_USE_CASE+","+W_CALIBRATION_TARGET+","+getRobPos()+"];");
 
-        updateCameraState;
+         ! Format the object pose string from the camera response to fit the ABB pattern
+        RETURN stringToPose(cameraReply);
+    ENDFUNC
 
-        ! Run calibration procedure if camera to robot is not already calibrated
-        IF wenglorCalibDone=FALSE THEN
-            runCalibration;
-        ENDIF
-
-        IF (wenglorDetection=emptyPose) THEN
-            UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Exit program as wenglorDetection pose is not set."\Buttons:=btnOK,\Icon:=iconWarning;
-            EXIT;
-        ENDIF
-
-        updateCameraState;
-
-        ! calibration data required, so abort, when they are still not available
-        IF (wenglorCalibDone=FALSE) THEN
-            UIMsgBox\Header:=WENGLOR_MESSAGE_HEADER,"Exit program as calibration data is not available",\Buttons:=btnOK\Icon:=iconWarning;
-            EXIT;
-        ENDIF
-
-        sendSimpleCommand("job:change["+WENGLOR_DETECTION_JOB+"];");
-
-        MoveL wenglorDetection,v200,fine,currentToolValue;
-
-        objectPose:=detectObjects();
-
-        MoveL objectPose,v100,fine,currentToolValue;
-    ENDPROC
-
-    ! Fills the buffer on camera side with the object information and returns the first object object pose
+    ! Fills the camera-side buffer with object information and returns the first object pose.
     FUNC robtarget detectObjects()
         VAR string cameraReply;
-        VAR string formattedMessage;
-        VAR bool errorCodeInside;
-        VAR num errorCode;
-        VAR robtarget errorPose;
 
-        cameraReply:=sendAndReadString("detect["+WENGLOR_USE_CASE+","+getRobPos()+"];");
-
-        errorCodeInside:=StrToVal(cameraReply,errorCode);
-        IF (errorCodeInside) THEN
-            ! Return current pose in case of error, as no other pose can be considered safe
-            setReturnError errorCode;
-            errorPose:=CRobT();
-            RETURN errorPose;
-        ENDIF
+        cameraReply:=sendAndReadString("detect["+W_USE_CASE+","+getRobPos()+"];");
 
         ! Format the object pose string from the camera response to fit the ABB pattern
-        formattedMessage:=replaceParantheses(cameraReply);
-        RETURN stringToPose(formattedMessage);
+        RETURN stringToPose(cameraReply);
     ENDFUNC
 
-    ! After the wenglorDetection, when the object infromation buffer is filled on camera side, you can read the pose of an object, linked in univison
-    LOCAL FUNC robtarget readPoseIndex(num index)
-        VAR string cameraReply;
-        VAR string formattedMessage;
-        VAR bool errorCodeInside;
-        VAR num errorCode;
-        VAR robtarget errorPose;
-
-        cameraReply:=sendAndReadString("pose:get["+ValToStr(index)+"];");
-
-        errorCodeInside:=StrToVal(cameraReply,errorCode);
-        IF (errorCodeInside) THEN
-            ! return current pose in case of error, as no other pose can be considered safe
-            setReturnError errorCode;
-            errorPose:=CRobT();
-            RETURN errorPose;
-        ENDIF
-
-        formattedMessage:=replaceParantheses(cameraReply);
-        RETURN stringToPose(formattedMessage);
-    ENDFUNC
-
-    ! After the wenglorDetection, when the object infromation buffer is filled on camera side, you can read the number of objects, that were found, if linked in univison
+    ! After wDetectionPose, when the object information buffer is filled on the camera side, you can read the number of objects found, if linked in uniVision.
     LOCAL FUNC num readNumObjects()
         VAR string cameraReply;
         VAR bool numInside;
@@ -104,17 +42,21 @@ MODULE wenglorDetect
 
         numInside:=StrToVal(cameraReply,numRead);
         IF (numInside) THEN
-            IF (numRead<0) THEN
-                setReturnError numRead;
-                RETURN -1;
-            ELSE
-                RETURN numRead;
-            ENDIF
+            RETURN numRead;
         ENDIF
     ENDFUNC
 
-    ! After the wenglorDetection, when the object infromation buffer is filled on camera side, you can read the shape model of an object, if linked in univison
-    LOCAL FUNC num readShapeIndex(num index)
+    ! After wDetectionPose, when the object information buffer is filled on the camera side, you can read the pose of an object, if linked in uniVision.
+    LOCAL FUNC robtarget readPoseByIndex(num index)
+        VAR string cameraReply;
+
+        cameraReply:=sendAndReadString("pose:get["+ValToStr(index)+"];");
+        ! Format the object pose string from the camera response to fit the ABB pattern
+        RETURN stringToPose(cameraReply);
+    ENDFUNC
+
+    ! After wDetectionPose, when the object information buffer is filled on the camera side, you can read the shape model of an object, if linked in uniVision.
+    LOCAL FUNC num readShapeByIndex(num index)
         VAR string cameraReply;
         VAR bool numInside;
         VAR num numRead;
@@ -123,22 +65,128 @@ MODULE wenglorDetect
 
         numInside:=StrToVal(cameraReply,numRead);
         IF (numInside) THEN
-            IF (numRead<0) THEN
-                setReturnError numRead;
-                RETURN -1;
-            ELSE
-                RETURN numRead;
-            ENDIF
+            RETURN numRead;
         ENDIF
     ENDFUNC
 
-    ! After the wenglorDetection, when the object infromation buffer is filled on camera side, you can read the additional value of an object, if linked in univison
-    LOCAL FUNC string readValueIndex(num index)
+    ! After wDetectionPose, when the object information buffer is filled on the camera side, you can read an additional value of an object, if linked in uniVision.
+    LOCAL FUNC string readValueByIndex(num index)
         VAR string cameraReply;
 
         cameraReply:=sendAndReadString("value:get["+ValToStr(index)+"];");
-        ! As the additional value is very usecase specific, no default checks can be done here.
+        ! As the additional value is very use-case specific, no default checks can be done here.
         ! So custom checks have to be added.
         RETURN cameraReply;
     ENDFUNC
+
+    PROC singleDetection()
+        VAR robtarget objectPose;
+        VAR string userValue;
+        VAR num shape;
+
+        ! update current tool
+        GetSysData currentToolValue;
+
+        IF (wDetectionPose=emptyPose) THEN
+            warningMessage("Exit program as wDetectionPose pose is not set.");
+            EXIT;
+        ENDIF
+
+        calibrateIfNeeded;
+
+        loadJob(W_DETECT_OBJECTS_JOB);
+
+        MoveL wDetectionPose,v200,fine,currentToolValue;
+
+        objectPose:=detectObjects();
+        shape:=readShapeByIndex(0);
+        ! Link additional value in the uniVision job before using readValueByIndex.
+        !userValue:=readValueByIndex(0);
+
+        ! Here you can add conditional checks for shape or userValue
+
+        MoveL objectPose,v100,fine,currentToolValue;
+    ENDPROC
+
+    PROC multiDetection()
+        VAR num numObjects;
+        VAR num shape;
+        VAR string userValue;
+        VAR robtarget objectPose;
+
+        ! update current tool
+        GetSysData currentToolValue;
+
+        IF (wDetectionPose=emptyPose) THEN
+            warningMessage("Exit program as wDetectionPose pose is not set.");
+            EXIT;
+        ENDIF
+
+        calibrateIfNeeded;
+
+        loadJob(W_DETECT_OBJECTS_JOB);
+
+        MoveL wDetectionPose,v200,fine,currentToolValue;
+
+        objectPose:=detectObjects();
+
+        numObjects:=readNumObjects();
+
+        FOR i FROM 0 TO numObjects-1 DO
+            shape:=readShapeByIndex(i);
+            ! Link additional value in the uniVision job before using readValueByIndex.
+            !userValue:=readValueByIndex(i);
+            objectPose:=readPoseByIndex(i);
+
+            ! Here you can add conditional checks for shape or userValue
+
+            MoveL objectPose,v100,fine,currentToolValue;
+        ENDFOR
+    ENDPROC
+
+    PROC updateReferenceFrame()
+        VAR robtarget targetPose;
+
+        calibrateIfNeeded;
+        loadJob(W_DETECT_TARGET_JOB);
+
+        ! Move to the pose where the vision system can see the calibration target
+        MoveL wDetectionPose,v200,fine,currentToolValue;
+
+        targetPose:=detectTarget();
+
+        ! Update the reference frame for all poses inside the machine
+        wReferenceFrame.uframe.trans :=targetPose.trans;
+        wReferenceFrame.uframe.rot := targetPose.rot;
+
+        IF (W_MACHINE_POSES_TAUGHT = FALSE) THEN
+            ! This handles the initial state for the first setup
+            infoMessage("Reference frame updated. Please teach poses now relative to wReferenceFrame");
+            infoMessage("Set W_MACHINE_POSES_TAUGHT to TRUE and restart after teaching the poses.");
+            EXIT;
+        ENDIF
+
+        ! Now the machine reference frame is updated and with it also the poses inside the machine, so the machine poses can be approached now
+
+        ! Maybe add support pose in between
+
+        ! Move to poses in machine that were taught relative to the wReferenceFrame, wPoseInMachine is just a dummy pose
+        MoveL wPoseInMachine,v200,fine,currentToolValue \WObj:=wReferenceFrame;
+    ENDPROC
+
+    PROC callUserCommand()
+        ! Call the desired procedure depending on the user command in the config
+        IF (W_USER_COMMAND="singleDetection") THEN
+            singleDetection;
+        ELSEIF (W_USER_COMMAND="multiDetection") THEN
+            multiDetection;
+        ELSEIF (W_USER_COMMAND="updateReferenceFrame") THEN
+            updateReferenceFrame;
+        ENDIF
+    ENDPROC
+
+    PROC main()
+            callUserCommand;
+    ENDPROC
+
 ENDMODULE

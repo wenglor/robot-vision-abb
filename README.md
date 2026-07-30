@@ -1,174 +1,83 @@
 # Example ABB RAPID program files for the generic vision interface
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 
-This repository demonstrates how to use the Generic Vision Interface with wenglor vision devices on a ABB controller. The included `.modx` and `.pgf` files form a working sample program [Generic wenglor vision interface.modx](sources/Generic%20wenglor%20vision%20interface.pgf) that you can adopt and customize for your application.
+This repository demonstrates how to use the Generic Vision Interface with wenglor vision devices on an ABB controller. The included `.modx` and `.pgf` files form a working sample program [Generic wenglor vision interface.pgf](sources/Generic%20wenglor%20vision%20interface.pgf) that you can adopt and customize for your application.
+
+> NOTE
+>
+> This repository focuses exclusively on ABB Robots-specific topics. For general robot vision information, please refer to the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/).
+
+📖 **Full documentation** is available in the [online manual](https://wenglor.github.io/robot-vision-abb/)
 
 ---
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Installation](#installation)
-3. [Running the Sample Program](#running-the-sample-program)
-4. [Configuration (`wenglorUserConfig.modx`)](#configuration-wengloruserconfigmodx)
-   1. [Network Setup](#network-setup)
-   2. [Adjusting Parameter](#adjusting-parameter)
-   3. [Teaching Poses](#teaching-poses-and-defining-movements)
-5. [Troubleshooting](#troubleshooting)
-   1. [Communication errors](#communication-errors)
-   2. [Insufficient Calibration Accuracy](#insufficient-calibration-accuracy)
-6. [Support & Feedback](#support--feedback)
+- [Prerequisites](#prerequisites)
+- [Files](#files)
+- [Installation](#installation)
+- [Running the Sample Program](#running-the-sample-program)
+- [Troubleshooting](#troubleshooting)
+- [Support & Feedback](#support--feedback)
+
+> NOTE
+>
+> The generic robot vision API (commands, return values, error codes), the calibration guidelines, and the uniVision job setup are documented once in the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/4_0_0_robot_vision_server/) and are **not** repeated here. This repository only describes how the ABB example uses them.
 
 ---
 
 ## Prerequisites
 
-> Tested with OmniCore controller and Robotware 7.5.13
+> Tested with OmniCore controller and RobotWare 7.5.13 (minimum required: RobotWare 7.3.2)
 
 - Basic knowledge of **RAPID**
-- Omnicore controller, IRC5 is currently not supported
-- RapidSocket are enabled in the controller communication configuration
-- [B60](https://www.wenglor.com/en/Machine-Vision/Smart-Cameras-and-Vision-Sensors/Smart-Camera-B60/c/cxmCID221375) (firmware >= 1.4) or [Machine Vision Controller (MVC)](https://www.wenglor.com/en/Machine-Vision/Machine-Vision-Controllers/c/cxmCID221381) (firmware >= 1.1)
-- A [uniVision](https://www.wenglor.com/en/Machine-Vision/Machine-Vision-Software/Image-Processing-Software-uniVision-3/c/cxmCID222459) job for calibration and object detection
+- OmniCore controller (RobotWare 7.3.2+) or IRC5 controller (RobotWare 5.15+) — for IRC5, rename `.modx` files to `.mod`, update references in the `.pgf` file, and activate the **PC Interface** option
+- **RapidSockets** enabled in the controller communication configuration (RobotStudio → Communication → Firewall Manager)
+- [B60](https://www.wenglor.com/en/Machine-Vision/Smart-Cameras-and-Vision-Sensors/Smart-Camera-B60/c/cxmCID221375) or [Machine Vision Controller (MVC)](https://www.wenglor.com/en/Machine-Vision/Machine-Vision-Controllers/c/cxmCID221381)
+- A [uniVision 3](https://www.wenglor.com/en/Machine-Vision/Machine-Vision-Software/Image-Processing-Software-uniVision-3/c/cxmCID222459) job for calibration and object detection, with the robot manufacturer set to **ABB** on the device website (Tab `Jobs` → `Robot Server`)
+
+---
+
+## Files
+
+The [sources](sources) directory of this repository contains:
+
+| File | Contents |
+| --- | --- |
+| `Generic wenglor vision interface.pgf` | Program file that references the modules below. |
+| `wenglorUserConfig.modx` | User configuration (IP, port, poses, jobs, use case). See [User Configuration](docs/2_0_0_user_configuration.md). |
+| `wenglorGlobal.modx` | Core and helper functions (socket communication, conversions). |
+| `wenglorCalibration.modx` | Hand-eye calibration and verification. |
+| `wenglorDetect.modx` | Object detection and movement to detected objects. |
 
 ---
 
 ## Installation
 
-1. Get the files from the [sources](sources) directory.
-2. Copy them to the robot controller.
-
-   | Sources                                        | Destination                                      |
-   |------------------------------------------------|--------------------------------------------------|
-   | robot files from [sources folder](sources)     | `/HOME` or `/HOME/<project_folder>`              |
-
-3. Follow the [configuration](#configuration-wengloruserconfigmodx) steps.
+1. Get the files from the [sources](sources) directory and copy them to the robot controller (e.g. `/HOME` or `/HOME/<project_folder>`).
+2. Follow the [user configuration](docs/2_0_0_user_configuration.md) steps.
 
 ---
 
 ## Running the Sample Program
 
-1. Load the program [Generic wenglor vision interface.modx](sources/Generic%20wenglor%20vision%20interface.pgf) on your robot.
+1. Load the program **Generic wenglor vision interface** on your robot.
 2. Select the TCP used for calibration in the FlexPendant.
 3. Execute the program and monitor the messages on the FlexPendant display.
 
+For details on the program flow (calibration, single/multi detection, reference frame updates), see [Robot Program](docs/3_0_0_robot_program.md).
+
 ---
-
-## Configuration (`wenglorUserConfig.modx`)
-
-There are two options to set the variables:
-
-1. You can either update those values by navigating to the [wenglorUserConfig.modx file](sources/wenglorUserConfig.modx)
-2. By using the *Program Data* module and change the scope to the wenglorUserConfig and navigate through the data types
-
-### Network Setup
-
-```modx
-    ! Replace ip address and port with your setup
-    CONST string WENGLOR_IP_ADDRESS:="192.168.100.1";
-    CONST num WENGLOR_CAM_PORT:=32006;
-```
-
-### Adjusting Parameter
-
-<details>
-   <summary>Click to see the relevant parameter adjustments in the wenglorUserConfig.modx file </summary>
-
-```modx
-    ! Replace ip address and port with your setup
-    CONST string WENGLOR_IP_ADDRESS:="192.168.100.1";
-    CONST num WENGLOR_CAM_PORT:=32006;
-
-    ! Comment out the correct line depending on the selected camera/robot setup
-    CONST string WENGLOR_USE_CASE:="camera_on_robot";
-    !CONST string WENGLOR_USE_CASE := "camera_not_on_robot";
-
-    ! Replace with the calibration plate you are using
-    ! if you are using zvzj005, replace with zvzj001 and
-    ! if you are using zvzj006, replace with zvzj002
-    CONST string WENGLOR_CALIBRATION_PLATE:="zvzj001";
-    ! Replace the calibration job with the one you created in uniVision
-    CONST string WENGLOR_CALIBRATION_JOB:="calibration.u3p";
-    CONST string WENGLOR_DETECTION_JOB:="find_objects.u3p";
-
-    ! Adjust validation z safety offset [mm]
-    CONST num WENGLOR_Z_SAFETY_OFFSET_MM:=10;
-```
-
-</details>
-
-### Teaching Poses and Defining Movements
-
-If you taught more than 5 poses remember to update the number of calibration poses
-
-<details>
-   <summary>Click to see where to set the poses in the wenglorUserConfig.src file </summary>
-
-```modx
-    ! Set speed for calibration movements here
-    CONST speeddata WENGLOR_CALIB_SPEED:=v100;
-    ! Set calibration poses here
-    VAR robtarget wenglorCalib1:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    VAR robtarget wenglorCalib2:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    VAR robtarget wenglorCalib3:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    VAR robtarget wenglorCalib4:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    VAR robtarget wenglorCalib5:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-
-    ! Set wenglorDetection pose here for camera_not_on_robot case, otherwise don't change it as will be changed in runCalibration()
-    PERS robtarget wenglorDetection:=[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-```
-
-</details>
 
 ## Troubleshooting
 
-### Communication Errors
-
-- Verify IP/port in [wenglorUserConfig.modx](sources/wenglorUserConfig.modx)
-- Ensure the robot server on the vision device is active
-  - Go to the device website->Jobs->Processing Instance->Robot Server
-- Check network connectivity/firewall
-
-### Insufficient Calibration Accuracy
-
-You can use more than 5 calibration poses by adding more calibration movements in the [wenglorCalibration.modx](sources/wenglorCalibration.modx) file.
-
-<details>
-   <summary>Click to see where to set the poses in the wenglorUserConfig.src file </summary>
-
-   ```modx
-      PROC runCalibration()
-         ...      <!-- Non relevant code was cut out -->
-
-        MoveL wenglorCalib1,WENGLOR_CALIB_SPEED,fine,currentToolValue;
-        WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
-
-        MoveL wenglorCalib2,WENGLOR_CALIB_SPEED,fine,currentToolValue;
-        WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
-
-        MoveL wenglorCalib3,WENGLOR_CALIB_SPEED,fine,currentToolValue;
-        WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
-
-        MoveL wenglorCalib4,WENGLOR_CALIB_SPEED,fine,currentToolValue;
-        WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
-
-        MoveL wenglorCalib5,WENGLOR_CALIB_SPEED,fine,currentToolValue;
-        WaitTime 1;
-        sendSimpleCommand("calibration:add["+getRobPos()+"];");
-
-        ! Add more calibration poses if wanted                       <!-- Add more calibration poses using the same scheme -->
-   ```
-
-</details>
+See the [Troubleshooting](docs/4_0_0_troubleshooting.md) page for insufficient calibration accuracy, height offsets in detected poses, communication errors, device error codes, and unexpected program exits.
 
 ---
 
 ## Support & Feedback
 
-- **Bugs:** Please open a new Issue in the [GitHub Issues section](../../issues) if needed
-- **Feature Requests & Ideas:** Discuss suggestions in the Discussions → Ideas category under [GitHub Discussions](../../discussions)
+- **Bugs:** Please open a new Issue in the [GitHub Issues section](https://github.com/wenglor/robot-vision-abb/issues) if needed.
+- **Feature Requests & Ideas:** Discuss suggestions in the Discussions → Ideas category under [GitHub Discussions](https://github.com/wenglor/robot-vision-abb/discussions).
+- **Product page:** [www.wenglor.com/product/DNNF023](https://www.wenglor.com/product/DNNF023) — uniVision 3 software, device firmware, and operating instructions. The RAPID example files themselves are in this repository's [sources](sources) directory.
