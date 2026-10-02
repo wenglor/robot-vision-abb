@@ -35,7 +35,7 @@ In the ABB software **RobotStudio**, adjust the network settings of the ABB robo
 
 !!! note
 
-    On the Machine Vision Device website (Tab `Jobs` → `Robot Server`), make sure the robot server is active and the robot manufacturer is set to **ABB**. See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/4_3_0_settings_on_device_website/) in the wenglor robot vision manual.
+    On the Machine Vision Device website (Tab `Jobs` → `Robot Server`), make sure the robot server is active and the robot manufacturer is set to **ABB**. See [Settings on Device Website](https://wenglor.github.io/robot-vision-generic-string/5_2_0_settings_on_device_website/) in the wenglor robot vision manual.
 
 ## Loading the program
 
@@ -45,4 +45,4 @@ Adjust the parameters in `wenglorUserConfig.modx` to match your setup — see [U
 
 !!! note
 
-    For details about the communication to the robot server, see [Generic Robot Vision API](https://wenglor.github.io/robot-vision-generic-string/4_7_0_generic_robot_vision_interface/) in the wenglor robot vision manual.
+    For details about the communication to the robot server, see [Generic Robot Vision API](https://wenglor.github.io/robot-vision-generic-string/5_6_0_generic_robot_vision_api/) in the wenglor robot vision manual.

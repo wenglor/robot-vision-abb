@@ -5,7 +5,7 @@ MODULE wenglorGlobal
     !
     ! Author: wenglor sensoric GmbH
     !
-    ! Version: 1.2.0
+    ! Version: 1.3.0
     !
     ! Description:
     !   This module provides all core and helper functions shared with the calibration and detection modules.
@@ -151,6 +151,8 @@ MODULE wenglorGlobal
             errorMsg:="Bad device robot vision message";
         ELSEIF errorCodeAbs=5010 THEN
             errorMsg:="Index error";
+		ELSEIF errorCodeAbs=5011 THEN
+            errorMsg:="Calibration pose variation insufficient";	
         ELSE
             errorMsg:="Unknown error code";
         ENDIF
