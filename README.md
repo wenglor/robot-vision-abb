@@ -1,8 +1,8 @@
 # Example ABB RAPID program files for the generic vision interface
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 
-This repository demonstrates how to use the Generic Vision Interface with wenglor vision devices on an ABB controller. The included `.modx` and `.pgf` files form a working sample program [Generic wenglor vision interface.pgf](sources/Generic%20wenglor%20vision%20interface.pgf) that you can adopt and customize for your application.
+This repository demonstrates how to use the Generic Vision Interface with wenglor vision devices on an ABB controller. The included `.modx` and `.pgf` files form a working sample program [Generic wenglor vision interface.pgf](sources/Generic%20wenglor%20vision%20interface.pgf) that you can adapt and customize for your application.
 
 > NOTE
 >
@@ -23,7 +23,7 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
 
 > NOTE
 >
-> The generic robot vision API (commands, return values, error codes), the calibration guidelines, and the uniVision job setup are documented once in the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/4_0_0_robot_vision_server/) and are **not** repeated here. This repository only describes how the ABB example uses them.
+> The generic robot vision API (commands, return values, error codes), the calibration guidelines, and the uniVision job setup are documented once in the [wenglor robot vision manual](https://wenglor.github.io/robot-vision-generic-string/5_1_0_basics_with_robot_server/) and are **not** repeated here. This repository only describes how the ABB example uses them.
 
 ---
 
@@ -34,8 +34,8 @@ This repository demonstrates how to use the Generic Vision Interface with wenglo
 - Basic knowledge of **RAPID**
 - OmniCore controller (RobotWare 7.3.2+) or IRC5 controller (RobotWare 5.15+) — for IRC5, rename `.modx` files to `.mod`, update references in the `.pgf` file, and activate the **PC Interface** option
 - **RapidSockets** enabled in the controller communication configuration (RobotStudio → Communication → Firewall Manager)
-- [B60](https://www.wenglor.com/en/Machine-Vision/Smart-Cameras-and-Vision-Sensors/Smart-Camera-B60/c/cxmCID221375) or [Machine Vision Controller (MVC)](https://www.wenglor.com/en/Machine-Vision/Machine-Vision-Controllers/c/cxmCID221381)
-- A [uniVision 3](https://www.wenglor.com/en/Machine-Vision/Machine-Vision-Software/Image-Processing-Software-uniVision-3/c/cxmCID222459) job for calibration and object detection, with the robot manufacturer set to **ABB** on the device website (Tab `Jobs` → `Robot Server`)
+- [B60](https://www.wenglor.com/B60) or [Machine Vision Controller (MVC)](https://www.wenglor.com/MachineVisionController)
+- A [uniVision 3](https://www.wenglor.com/uniVision3) job for calibration and object detection, with the robot manufacturer set to **ABB** on the device website (Tab `Jobs` → `Robot Server`)
 
 ---
 

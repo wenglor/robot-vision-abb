@@ -6,7 +6,7 @@ MODULE wenglorCalibration
     !
     ! Author: wenglor sensoric GmbH
     !
-    ! Version: 1.2.0
+    ! Version: 1.3.0
     !
     ! Description:
     !   This module handles calibration from the camera to the robot and, if required, calibration

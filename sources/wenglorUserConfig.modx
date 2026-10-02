@@ -5,7 +5,7 @@ MODULE wenglorUserConfig
     !
     ! Author: wenglor sensoric GmbH
     !
-    ! Version: 1.2.0
+    ! Version: 1.3.0
     !
     ! Description:
     !   This module contains global variables and helper functions.
@@ -48,6 +48,9 @@ MODULE wenglorUserConfig
     !CONST string W_USE_CASE := "camera_not_on_robot";
 
     ! Replace with the calibration target you are using
+	! Calibration target: 
+	! "zvzj001" | "zvzj002" | "zvzj003" | "zvzj004" |
+	! "24x30mm" | "375x550mm" | "550x800mm"
     ! if you are using zvzj005, replace with zvzj001 and
     ! if you are using zvzj006, replace with zvzj002
     CONST string W_CALIBRATION_TARGET:="zvzj001";
