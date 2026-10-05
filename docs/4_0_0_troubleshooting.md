@@ -7,14 +7,14 @@ Quick reference — jump to the matching symptom below for details:
 | Reprojection error is high / picks are inaccurate | Too few or too similar calibration poses, poor calibration plate visibility | [Insufficient calibration accuracy](#insufficient-calibration-accuracy) |
 | Robot picks above/below the object | Height offset or wrong tool (TCP) | [Height offset in detected poses](#height-offset-in-detected-poses) |
 | No connection / no reply from the camera | Wrong IP/port, RapidSockets disabled, robot server inactive | [Communication errors](#communication-errors) |
-| Program shows a warning with a negative number (`-5001` … `-5010`) | Device-side error, e.g. bad job name or missing calibration | [Error codes returned by the device](#error-codes-returned-by-the-device) |
+| Program shows a warning with a negative number (`-5001` … `-5011`) | Device-side error, e.g. bad job name or missing calibration | [Error codes returned by the device](#error-codes-returned-by-the-device) |
 | Program exits without a clear error | Poses not taught, missing detection pose | [Program exits unexpectedly](#program-exits-unexpectedly) |
 
 ## Insufficient calibration accuracy
 
 | Check | Action |
 | --- | --- |
-| Number of calibration poses | Teach more than five (e.g. seven to eleven give more accurate results). Follow the naming scheme and extend the pose sequence in `wenglorCalibration.runCalibration()`. |
+| Number of calibration poses | At least five poses are required; teaching more improves accuracy (seven to eleven give more accurate results). Follow the naming scheme and extend the pose sequence in `wenglorCalibration.runCalibration()`. |
 | Pose variation | Vary the pose angles as much as possible — motions with non-parallel rotation axes give the most accurate results. |
 | Calibration plate visibility | Make sure the plate covers as much of the camera image as possible and is fully visible. |
 | Calibration plate type | Prefer the wenglor ZVZJ calibration plate over a printed version — its reprojection error is typically five times smaller. If printing, print the PDF at actual size on flat, stiff material. |
@@ -38,7 +38,7 @@ Quick reference — jump to the matching symptom below for details:
 
 ## Error codes returned by the device
 
-If the robot server returns a negative error code (`-5001` … `-5010`), the example maps it to a readable message in `wenglorGlobal.setReturnError` and shows it on the FlexPendant before exiting. For the meaning of each code, see the [Generic Robot Vision Interface → Error codes](https://wenglor.github.io/robot-vision-generic-string/4_7_0_generic_robot_vision_interface/#error-codes) in the wenglor robot vision manual.
+If the robot server returns a negative error code (`-5001` … `-5011`), the example maps it to a readable message in `wenglorGlobal.setReturnError` and shows it on the FlexPendant before exiting. For the meaning of each code, see the [Generic Robot Vision API → Error codes](https://wenglor.github.io/robot-vision-generic-string/5_6_0_generic_robot_vision_api/#error-codes) in the wenglor robot vision manual.
 
 ## Program exits unexpectedly
 
